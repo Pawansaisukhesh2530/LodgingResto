@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard | Lodgings Resto')}"></head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar collapse d-lg-block" id="sidebarCollapse" th:replace="~{fragments/layout :: sidebar('dashboard')}"></aside>
+    <div class="content-shell">
+        <header th:replace="~{fragments/layout :: topbar('Dashboard Overview')}"></header>
+
+        <main class="page-body">
+            <section class="hero-panel">
+                <div>
+                    <div class="eyebrow">Luxury hotel intelligence</div>
+                    <h2>Operate rooms, reservations, billing, and restaurant flow from a premium command center.</h2>
+                    <p class="text-muted mb-0">A polished dashboard experience designed to feel like a modern hotel SaaS product.</p>
+                </div>
+                <div class="hero-status">
+                    <div class="status-chip"><span class="status-dot bg-success"></span> Live occupancy sync</div>
+                    <div class="status-chip"><span class="status-dot bg-primary"></span> Elegant UI enabled</div>
+                </div>
+            </section>
+
+            <section class="stats-grid">
+                <article class="stat-card gradient-navy">
+                    <div class="stat-icon"><i class="fa-solid fa-bed"></i></div>
+                    <div class="stat-label">Total Rooms</div>
+                    <div class="stat-value counter-value" th:attr="data-count=${totalRooms}" th:text="${totalRooms}">0</div>
+                    <div class="stat-note">Premium inventory overview</div>
+                </article>
+                <article class="stat-card gradient-blue">
+                    <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="stat-label">Available Rooms</div>
+                    <div class="stat-value counter-value" th:attr="data-count=${availableRooms}" th:text="${availableRooms}">0</div>
+                    <div class="stat-note">Ready for guest check-in</div>
+                </article>
+                <article class="stat-card gradient-gold">
+                    <div class="stat-icon"><i class="fa-solid fa-user-check"></i></div>
+                    <div class="stat-label">Occupied Rooms</div>
+                    <div class="stat-value counter-value" th:attr="data-count=${occupiedRooms}" th:text="${occupiedRooms}">0</div>
+                    <div class="stat-note">Active stays in progress</div>
+                </article>
+                <article class="stat-card gradient-plum">
+                    <div class="stat-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                    <div class="stat-label">Revenue</div>
+                    <div class="stat-value counter-value" th:attr="data-count=${revenue}" th:text="${'$' + revenue}">$0</div>
+                    <div class="stat-note">Estimated revenue signal</div>
+                </article>
+            </section>
+
+            <section class="row g-4 mt-1">
+                <div class="col-12 col-xl-8">
+                    <div class="glass-card h-100">
+                        <div class="section-header">
+                            <div>
+                                <div class="eyebrow">Operations chart</div>
+                                <h3 class="section-title mb-0">Room status distribution</h3>
+                            </div>
+                            <a th:href="@{/rooms/new}" class="btn btn-premium"><i class="fa-solid fa-plus me-2"></i>Add Room</a>
+                        </div>
+                        <div class="chart-wrap">
+                            <canvas id="roomChart" height="130"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-4">
+                    <div class="glass-card h-100">
+                        <div class="section-header">
+                            <div>
+                                <div class="eyebrow">Quick actions</div>
+                                <h3 class="section-title mb-0">Dashboard shortcuts</h3>
+                            </div>
+                        </div>
+                        <div class="quick-actions">
+                            <a th:href="@{/rooms/new}" class="quick-action-item">
+                                <i class="fa-solid fa-circle-plus"></i>
+                                <div>
+                                    <div class="fw-semibold">Create Room</div>
+                                    <div class="small text-muted">Add a premium room record</div>
+                                </div>
+                            </a>
+                            <a th:href="@{/rooms}" class="quick-action-item">
+                                <i class="fa-solid fa-table-list"></i>
+                                <div>
+                                    <div class="fw-semibold">Manage Rooms</div>
+                                    <div class="small text-muted">Search and filter inventory</div>
+                                </div>
+                            </a>
+                            <a href="javascript:void(0)" class="quick-action-item">
+                                <i class="fa-solid fa-chart-pie"></i>
+                                <div>
+                                    <div class="fw-semibold">View Analytics</div>
+                                    <div class="small text-muted">Future performance insights</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: flashToasts}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
+
+

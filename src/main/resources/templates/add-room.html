@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Add Room | Lodgings Resto')}"></head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar collapse d-lg-block" id="sidebarCollapse" th:replace="~{fragments/layout :: sidebar('rooms')}"></aside>
+    <div class="content-shell">
+        <header th:replace="~{fragments/layout :: topbar('Create New Room')}"></header>
+
+        <main class="page-body">
+            <section class="glass-card form-card mx-auto">
+                <div class="section-header mb-4">
+                    <div>
+                        <div class="eyebrow">Room creation</div>
+                        <h2 class="mb-0">Add a premium room</h2>
+                    </div>
+                    <a th:href="@{/rooms}" class="btn btn-outline-light btn-back-link"><i class="fa-solid fa-arrow-left me-2"></i>Back to Rooms</a>
+                </div>
+
+                <form th:action="@{/rooms}" th:object="${room}" method="post" class="premium-form row g-4">
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating premium-floating">
+                            <input type="text" class="form-control" th:field="*{roomNumber}" placeholder="Room Number">
+                            <label>Room Number</label>
+                        </div>
+                        <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('roomNumber')}" th:errors="*{roomNumber}"></div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating premium-floating">
+                            <select class="form-select" th:field="*{roomType}">
+                                <option value="" disabled selected>Select type</option>
+                                <option th:each="type : ${roomTypes}" th:value="${type}" th:text="${type.label}"></option>
+                            </select>
+                            <label>Room Type</label>
+                        </div>
+                        <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('roomType')}" th:errors="*{roomType}"></div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating premium-floating">
+                            <input type="number" step="0.01" min="0" class="form-control" th:field="*{price}" placeholder="Price">
+                            <label>Price</label>
+                        </div>
+                        <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating premium-floating">
+                            <select class="form-select" th:field="*{status}">
+                                <option value="" disabled selected>Select status</option>
+                                <option th:each="roomStatus : ${roomStatuses}" th:value="${roomStatus}" th:text="${roomStatus.label}"></option>
+                            </select>
+                            <label>Status</label>
+                        </div>
+                        <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-floating premium-floating">
+                            <textarea class="form-control textarea-premium" th:field="*{description}" placeholder="Description" style="height: 140px"></textarea>
+                            <label>Description</label>
+                        </div>
+                        <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+                    </div>
+                    <div class="col-12 d-flex justify-content-end gap-3">
+                        <a th:href="@{/rooms}" class="btn btn-outline-secondary px-4">Cancel</a>
+                        <button class="btn btn-premium btn-lg px-4" type="submit"><i class="fa-solid fa-floppy-disk me-2"></i>Save Room</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: flashToasts}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<!-- Image upload removed to simplify local development -->
+</body>
+</html>
+
