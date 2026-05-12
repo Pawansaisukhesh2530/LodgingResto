@@ -5,6 +5,8 @@ import com.example.lodgingresto.model.RoomStatus;
 import com.example.lodgingresto.model.RoomType;
 import com.example.lodgingresto.service.RoomService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,12 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-
-
 @Controller
 @RequestMapping
 public class DashboardController {
 
+    private static final Logger logger = LoggerFactory.getLogger(DashboardController.class);
     private final RoomService roomService;
 
     public DashboardController(RoomService roomService) {
@@ -77,7 +78,13 @@ public class DashboardController {
             redirectAttributes.addFlashAttribute("successMessage", "Room created successfully.");
             return "redirect:/rooms";
         } catch (IllegalArgumentException ex) {
+            logger.error("Illegal argument error while creating room: {}", ex.getMessage());
             bindingResult.rejectValue("roomNumber", "roomNumber.exists", ex.getMessage());
+            addCommonAttributes(model);
+            return "add-room";
+        } catch (Exception ex) {
+            logger.error("Unexpected error while creating room", ex);
+            bindingResult.reject("global", "An error occurred while creating the room: " + ex.getMessage());
             addCommonAttributes(model);
             return "add-room";
         }
@@ -112,7 +119,13 @@ public class DashboardController {
             redirectAttributes.addFlashAttribute("successMessage", "Room updated successfully.");
             return "redirect:/rooms";
         } catch (IllegalArgumentException ex) {
+            logger.error("Illegal argument error while updating room with ID {}: {}", id, ex.getMessage());
             bindingResult.rejectValue("roomNumber", "roomNumber.exists", ex.getMessage());
+            addCommonAttributes(model);
+            return "edit-room";
+        } catch (Exception ex) {
+            logger.error("Unexpected error while updating room with ID {}", id, ex);
+            bindingResult.reject("global", "An error occurred while updating the room: " + ex.getMessage());
             addCommonAttributes(model);
             return "edit-room";
         }
@@ -121,15 +134,28 @@ public class DashboardController {
     @PostMapping("/rooms/{id}/delete")
     public String deleteRoom(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            Room room = roomService.getRoomById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Room not found"));
+            logger.info("Attempting to delete room with ID: {}", id);
 
+            // Check if room exists
+            if (roomService.getRoomById(id).isEmpty()) {
+                logger.warn("Room with ID {} not found for deletion", id);
+                redirectAttributes.addFlashAttribute("errorMessage", "Room not found.");
+                return "redirect:/rooms";
+            }
 
+            // Delete the room
             roomService.deleteRoom(id);
+            logger.info("Room with ID {} deleted successfully", id);
             redirectAttributes.addFlashAttribute("successMessage", "Room deleted successfully.");
+
         } catch (IllegalArgumentException ex) {
+            logger.error("Illegal argument error while deleting room with ID {}: {}", id, ex.getMessage());
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        } catch (Exception ex) {
+            logger.error("Unexpected error while deleting room with ID {}", id, ex);
+            redirectAttributes.addFlashAttribute("errorMessage", "An error occurred while deleting the room: " + ex.getMessage());
         }
+
         return "redirect:/rooms";
     }
 
