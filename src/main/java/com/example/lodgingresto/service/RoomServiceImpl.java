@@ -4,6 +4,8 @@ import com.example.lodgingresto.model.Room;
 import com.example.lodgingresto.model.RoomStatus;
 import com.example.lodgingresto.model.RoomType;
 import com.example.lodgingresto.repository.RoomRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,9 @@ import java.util.Optional;
 public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public RoomServiceImpl(RoomRepository roomRepository) {
         this.roomRepository = roomRepository;
@@ -79,6 +84,15 @@ public class RoomServiceImpl implements RoomService {
         if (!roomRepository.existsById(id)) {
             throw new IllegalArgumentException("Room not found");
         }
+
+        try {
+            entityManager.createNativeQuery("delete from room_images where room_id = :roomId")
+                    .setParameter("roomId", id)
+                    .executeUpdate();
+        } catch (Exception ex) {
+            // Ignore cleanup failures for environments where the legacy room_images table is absent.
+        }
+
         roomRepository.deleteById(id);
     }
 
