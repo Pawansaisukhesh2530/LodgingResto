@@ -23,11 +23,17 @@
     <nav class="sidebar-nav">
         <a th:href="@{/dashboard}" th:classappend="${active == 'dashboard'} ? ' active' : ''" class="nav-link-item"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
         <a th:href="@{/rooms}" th:classappend="${active == 'rooms'} ? ' active' : ''" class="nav-link-item"><i class="fa-solid fa-bed"></i><span>Rooms</span></a>
-        <a href="javascript:void(0)" class="nav-link-item nav-link-placeholder"><i class="fa-solid fa-calendar-check"></i><span>Reservations</span></a>
-        <a href="javascript:void(0)" class="nav-link-item nav-link-placeholder"><i class="fa-solid fa-utensils"></i><span>Restaurant</span></a>
-        <a href="javascript:void(0)" class="nav-link-item nav-link-placeholder"><i class="fa-solid fa-file-invoice-dollar"></i><span>Billing</span></a>
-        <a href="javascript:void(0)" class="nav-link-item nav-link-placeholder"><i class="fa-solid fa-chart-line"></i><span>Analytics</span></a>
-        <a href="javascript:void(0)" class="nav-link-item nav-link-placeholder"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a>
+        <a th:href="@{/reservations}" th:classappend="${active == 'reservations'} ? ' active' : ''" class="nav-link-item"><i class="fa-solid fa-calendar-check"></i><span>Reservations</span></a>
+        <a th:href="@{/guests}" th:classappend="${active == 'guests'} ? ' active' : ''" class="nav-link-item"><i class="fa-solid fa-user-group"></i><span>Guests</span></a>
+        <a th:href="@{/restaurant}" th:classappend="${active == 'restaurant'} ? ' active' : ''" class="nav-link-item"><i class="fa-solid fa-utensils"></i><span>Restaurant</span></a>
+        <a th:href="@{/billing}" th:classappend="${active == 'billing'} ? ' active' : ''" class="nav-link-item"><i class="fa-solid fa-file-invoice-dollar"></i><span>Billing</span></a>
+        <a th:href="@{/employees}" th:classappend="${active == 'employees'} ? ' active' : ''" class="nav-link-item"><i class="fa-solid fa-people-roof"></i><span>Employees</span></a>
+        <a th:href="@{/inventory}" th:classappend="${active == 'inventory'} ? ' active' : ''" class="nav-link-item"><i class="fa-solid fa-boxes-stacked"></i><span>Inventory</span></a>
+        <a th:href="@{/reports}" th:classappend="${active == 'reports'} ? ' active' : ''" class="nav-link-item"><i class="fa-solid fa-chart-line"></i><span>Reports</span></a>
+        <a th:href="@{/notifications}" th:classappend="${active == 'notifications'} ? ' active' : ''" class="nav-link-item"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
+        <form th:action="@{/logout}" method="post" class="mt-2">
+            <button type="submit" class="nav-link-item nav-link-placeholder w-100 text-start border-0 bg-transparent"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></button>
+        </form>
     </nav>
     <div class="sidebar-footer">
         <div class="sidebar-footer-card">
@@ -38,7 +44,7 @@
     </div>
 </aside>
 
-<header th:fragment="topbar(pageTitle)" class="topbar">
+<header th:fragment="topbar(pageTitle, searchAction, searchValue, searchPlaceholder)" class="topbar">
     <div class="d-flex align-items-center gap-3 flex-wrap w-100">
         <button class="btn btn-sidebar-toggle d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarCollapse">
             <i class="fa-solid fa-bars"></i>
@@ -47,10 +53,10 @@
             <div class="text-muted small text-uppercase fw-semibold">Hotel Administration</div>
             <h1 class="page-title" th:text="${pageTitle}">Dashboard</h1>
         </div>
-        <div class="ms-lg-auto w-100 w-lg-auto topbar-search">
-            <form th:action="@{/rooms}" method="get" class="search-form">
+        <div class="ms-lg-auto w-100 w-lg-auto topbar-search" th:if="${searchAction != null}">
+            <form th:action="${searchAction}" method="get" class="search-form">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" name="search" class="form-control" placeholder="Search rooms, number, description..." th:value="${search}">
+                <input type="text" name="search" class="form-control" th:placeholder="${searchPlaceholder != null ? searchPlaceholder : 'Search...'}" th:value="${searchValue}">
             </form>
         </div>
         <div class="topbar-actions">
@@ -65,6 +71,13 @@
         </div>
     </div>
 </header>
+
+<footer th:fragment="footer" class="py-4 px-4 text-muted small">
+    <div class="d-flex justify-content-between flex-wrap gap-2 border-top pt-3">
+        <span>© 2026 Lodgings Resto. Premium operations dashboard.</span>
+        <span>Spring Boot • PostgreSQL • Thymeleaf • Bootstrap 5</span>
+    </div>
+</footer>
 
 <div th:fragment="flashToasts" class="toast-stack position-fixed top-0 end-0 p-4" style="z-index: 1080;">
     <div th:if="${successMessage}" class="toast align-items-center text-bg-success border-0 show shadow-lg mb-3" role="alert">

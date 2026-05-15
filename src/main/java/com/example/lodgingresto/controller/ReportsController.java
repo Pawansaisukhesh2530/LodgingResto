@@ -1,5 +1,7 @@
 package com.example.lodgingresto.controller;
 
+import com.example.lodgingresto.service.BillingService;
+import com.example.lodgingresto.service.RoomService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,11 +13,22 @@ import java.util.List;
 @RequestMapping("/reports")
 public class ReportsController {
 
+    private final BillingService billingService;
+    private final RoomService roomService;
+
+    public ReportsController(BillingService billingService, RoomService roomService) {
+        this.billingService = billingService;
+        this.roomService = roomService;
+    }
+
     @GetMapping
     public String index(Model model) {
-        // Example dataset; real data should be provided by ReportService
-        model.addAttribute("revenueData", List.of(1200, 1400, 1100, 1800, 1500, 2000));
-        model.addAttribute("labels", List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun"));
+        model.addAttribute("revenueData", List.of(
+                roomService.calculateRevenue().intValue(),
+                billingService.getRevenue().intValue(),
+                billingService.getTaxAmount().intValue(),
+                billingService.getAllInvoices().size()));
+        model.addAttribute("labels", List.of("Rooms", "Revenue", "Tax", "Invoices"));
         return "reports";
     }
 }

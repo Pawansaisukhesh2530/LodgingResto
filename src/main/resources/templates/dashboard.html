@@ -5,7 +5,7 @@
 <div class="app-shell">
     <aside class="sidebar collapse d-lg-block" id="sidebarCollapse" th:replace="~{fragments/layout :: sidebar('dashboard')}"></aside>
     <div class="content-shell">
-        <header th:replace="~{fragments/layout :: topbar('Dashboard Overview')}"></header>
+        <header th:replace="~{fragments/layout :: topbar('Dashboard Overview', null, null, null)}"></header>
 
         <main class="page-body">
             <section class="hero-panel">
@@ -48,6 +48,18 @@
             </section>
 
             <section class="row g-4 mt-1">
+                <div class="col-12 col-md-4">
+                    <div class="stat-mini-card"><span>Total Guests</span><strong th:text="${totalGuests}">0</strong></div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="stat-mini-card"><span>Total Reservations</span><strong th:text="${totalReservations}">0</strong></div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="stat-mini-card"><span>Inventory Alerts</span><strong th:text="${inventoryAlerts}">0</strong></div>
+                </div>
+            </section>
+
+            <section class="row g-4 mt-1">
                 <div class="col-12 col-xl-8">
                     <div class="glass-card h-100">
                         <div class="section-header">
@@ -58,7 +70,9 @@
                             <a th:href="@{/rooms/new}" class="btn btn-premium"><i class="fa-solid fa-plus me-2"></i>Add Room</a>
                         </div>
                         <div class="chart-wrap">
-                            <canvas id="roomChart" height="130"></canvas>
+                            <canvas id="roomChart"
+                                    height="130"
+                                    th:attr="data-labels=${roomChartLabels},data-values=${roomChartValues}"></canvas>
                         </div>
                     </div>
                 </div>
@@ -92,6 +106,53 @@
                                     <div class="small text-muted">Future performance insights</div>
                                 </div>
                             </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="row g-4 mt-1">
+                <div class="col-12 col-xl-6">
+                    <div class="glass-card p-4 h-100">
+                        <div class="section-header">
+                            <div>
+                                <div class="eyebrow">Recent reservations</div>
+                                <h3 class="section-title mb-0">Latest bookings</h3>
+                            </div>
+                        </div>
+                        <div class="table-responsive premium-table-wrap mt-3">
+                            <table class="table premium-table mb-0">
+                                <thead><tr><th>Guest</th><th>Room</th><th>Status</th></tr></thead>
+                                <tbody>
+                                <tr th:each="reservation : ${recentReservations}">
+                                    <td th:text="${reservation.guest != null ? reservation.guest.fullName : '-'}">Guest</td>
+                                    <td th:text="${reservation.room != null ? reservation.room.roomNumber : '-'}">Room</td>
+                                    <td th:text="${reservation.paymentStatus}">PENDING</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-6">
+                    <div class="glass-card p-4 h-100">
+                        <div class="section-header">
+                            <div>
+                                <div class="eyebrow">Recent invoices</div>
+                                <h3 class="section-title mb-0">Billing activity</h3>
+                            </div>
+                        </div>
+                        <div class="table-responsive premium-table-wrap mt-3">
+                            <table class="table premium-table mb-0">
+                                <thead><tr><th>Invoice</th><th>Type</th><th>Total</th></tr></thead>
+                                <tbody>
+                                <tr th:each="invoice : ${recentInvoices}">
+                                    <td th:text="${invoice.invoiceNumber}">INV</td>
+                                    <td th:text="${invoice.invoiceType}">ROOM</td>
+                                    <td th:text="${invoice.totalAmount}">$0</td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

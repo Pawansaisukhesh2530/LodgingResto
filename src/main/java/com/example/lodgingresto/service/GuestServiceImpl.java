@@ -47,8 +47,28 @@ public class GuestServiceImpl implements GuestService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Guest> searchGuests(String search) {
+        String normalized = search == null ? "" : search.trim().toLowerCase();
+        if (normalized.isEmpty()) {
+            return getAllGuests();
+        }
+        return guestRepository.findAll().stream()
+                .filter(guest -> contains(guest.getFullName(), normalized)
+                        || contains(guest.getPhoneNumber(), normalized)
+                        || contains(guest.getEmail(), normalized)
+                        || contains(guest.getAddress(), normalized)
+                        || contains(guest.getIdProofNumber(), normalized))
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<Guest> getGuestById(Long id) {
         return guestRepository.findById(id);
+    }
+
+    private boolean contains(String value, String search) {
+        return value != null && value.toLowerCase().contains(search);
     }
 }
 

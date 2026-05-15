@@ -10,6 +10,7 @@ public interface GuestService {
     Guest updateGuest(Long id, Guest guest);
     void deleteGuest(Long id);
     List<Guest> getAllGuests();
+    List<Guest> searchGuests(String search);
     Optional<Guest> getGuestById(Long id);
 }
 

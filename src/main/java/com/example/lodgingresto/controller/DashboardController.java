@@ -3,6 +3,12 @@ package com.example.lodgingresto.controller;
 import com.example.lodgingresto.model.Room;
 import com.example.lodgingresto.model.RoomStatus;
 import com.example.lodgingresto.model.RoomType;
+import com.example.lodgingresto.service.BillingService;
+import com.example.lodgingresto.service.EmployeeService;
+import com.example.lodgingresto.service.GuestService;
+import com.example.lodgingresto.service.InventoryService;
+import com.example.lodgingresto.service.ReservationService;
+import com.example.lodgingresto.service.RestaurantService;
 import com.example.lodgingresto.service.RoomService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -19,15 +25,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
+import java.util.Comparator;
+
 @Controller
 @RequestMapping
 public class DashboardController {
 
     private static final Logger logger = LoggerFactory.getLogger(DashboardController.class);
     private final RoomService roomService;
+    private final GuestService guestService;
+    private final ReservationService reservationService;
+    private final EmployeeService employeeService;
+    private final InventoryService inventoryService;
+    private final RestaurantService restaurantService;
+    private final BillingService billingService;
 
-    public DashboardController(RoomService roomService) {
+    public DashboardController(RoomService roomService,
+                               GuestService guestService,
+                               ReservationService reservationService,
+                               EmployeeService employeeService,
+                               InventoryService inventoryService,
+                               RestaurantService restaurantService,
+                               BillingService billingService) {
         this.roomService = roomService;
+        this.guestService = guestService;
+        this.reservationService = reservationService;
+        this.employeeService = employeeService;
+        this.inventoryService = inventoryService;
+        this.restaurantService = restaurantService;
+        this.billingService = billingService;
     }
 
     @GetMapping({"/", "/dashboard"})
@@ -36,7 +63,22 @@ public class DashboardController {
         model.addAttribute("totalRooms", roomService.countAllRooms());
         model.addAttribute("availableRooms", roomService.countAvailableRooms());
         model.addAttribute("occupiedRooms", roomService.countOccupiedRooms());
-        model.addAttribute("revenue", roomService.calculateRevenue());
+        model.addAttribute("reservedRooms", roomService.countReservedRooms());
+        model.addAttribute("maintenanceRooms", roomService.countMaintenanceRooms());
+        model.addAttribute("totalGuests", guestService.getAllGuests().size());
+        model.addAttribute("totalReservations", reservationService.getAllReservations().size());
+        model.addAttribute("employeeCount", employeeService.getAllEmployees().size());
+        model.addAttribute("inventoryAlerts", inventoryService.getLowStockItems(5).size());
+        model.addAttribute("revenue", billingService.getRevenue());
+        model.addAttribute("restaurantSales", restaurantService.getAllOrders().stream()
+                .map(order -> order.getTotal() == null ? BigDecimal.ZERO : order.getTotal())
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
+        model.addAttribute("roomChartLabels", "Available|Occupied|Reserved|Maintenance");
+        model.addAttribute("roomChartValues", roomService.countAvailableRooms() + "|" + roomService.countOccupiedRooms() + "|" + roomService.countReservedRooms() + "|" + roomService.countMaintenanceRooms());
+        model.addAttribute("recentGuests", guestService.getAllGuests().stream().sorted(Comparator.comparingLong(guest -> guest.getId() == null ? 0 : guest.getId())).toList());
+        model.addAttribute("recentReservations", reservationService.getAllReservations().stream().sorted(Comparator.comparingLong(res -> res.getId() == null ? 0 : res.getId())).toList());
+        model.addAttribute("recentOrders", restaurantService.getAllOrders().stream().sorted(Comparator.comparingLong(order -> order.getId() == null ? 0 : order.getId())).toList());
+        model.addAttribute("recentInvoices", billingService.getAllInvoices().stream().sorted(Comparator.comparingLong(invoice -> invoice.getId() == null ? 0 : invoice.getId())).toList());
         return "dashboard";
     }
 
@@ -53,6 +95,8 @@ public class DashboardController {
         model.addAttribute("totalRooms", roomService.countAllRooms());
         model.addAttribute("availableRooms", roomService.countAvailableRooms());
         model.addAttribute("occupiedRooms", roomService.countOccupiedRooms());
+        model.addAttribute("reservedRooms", roomService.countReservedRooms());
+        model.addAttribute("maintenanceRooms", roomService.countMaintenanceRooms());
         model.addAttribute("revenue", roomService.calculateRevenue());
         return "rooms";
     }

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Edit Inventory | Lodgings Resto')}"></head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar collapse d-lg-block" id="sidebarCollapse" th:replace="~{fragments/layout :: sidebar('inventory')}"></aside>
+    <div class="content-shell">
+        <header th:replace="~{fragments/layout :: topbar('Edit Inventory', @{/inventory}, null, null)}"></header>
+        <main class="page-body">
+            <section class="glass-card p-4 form-card mx-auto">
+                <div class="section-header mb-4">
+                    <div>
+                        <div class="eyebrow">Inventory update</div>
+                        <h2 class="mb-0">Edit inventory item</h2>
+                    </div>
+                    <a th:href="@{/inventory}" class="btn btn-outline-light btn-back-link">Back to Inventory</a>
+                </div>
+                <form th:action="@{/inventory/items/{id}(id=${item.id})}" th:object="${item}" method="post" class="row g-3">
+                    <input type="hidden" name="_method" value="put">
+                    <div class="col-md-6"><input th:field="*{name}" class="form-control form-control-premium" placeholder="Name"></div>
+                    <div class="col-md-6"><input th:field="*{quantity}" type="number" class="form-control form-control-premium" placeholder="Quantity"></div>
+                    <div class="col-12"><textarea th:field="*{description}" class="form-control textarea-premium" placeholder="Description"></textarea></div>
+                    <div class="col-12">
+                        <select name="supplierId" class="form-select form-select-premium">
+                            <option value="">Select supplier</option>
+                            <option th:each="sup : ${suppliers}" th:value="${sup.id}" th:text="${sup.name}" th:selected="${item.supplier != null and item.supplier.id == sup.id}"></option>
+                        </select>
+                    </div>
+                    <div class="col-12 text-end"><button class="btn btn-premium" type="submit">Update Item</button></div>
+                </form>
+            </section>
+        </main>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: flashToasts}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

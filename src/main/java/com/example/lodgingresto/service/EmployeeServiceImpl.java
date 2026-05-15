@@ -45,8 +45,28 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Employee> searchEmployees(String search) {
+        String normalized = search == null ? "" : search.trim().toLowerCase();
+        if (normalized.isEmpty()) {
+            return getAllEmployees();
+        }
+        return employeeRepository.findAll().stream()
+                .filter(employee -> contains(employee.getName(), normalized)
+                        || contains(employee.getDepartment(), normalized)
+                        || contains(employee.getPosition(), normalized)
+                        || contains(employee.getPhoneNumber(), normalized)
+                        || (employee.getSalary() != null && employee.getSalary().toString().contains(normalized)))
+                .toList();
+    }
+
+    @Override
     public Optional<Employee> getEmployeeById(Long id) {
         return employeeRepository.findById(id);
+    }
+
+    private boolean contains(String value, String search) {
+        return value != null && value.toLowerCase().contains(search);
     }
 }
 

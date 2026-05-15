@@ -86,8 +86,8 @@ public class RoomServiceImpl implements RoomService {
         }
 
         try {
-            entityManager.createNativeQuery("delete from room_images where room_id = :roomId")
-                    .setParameter("roomId", id)
+            entityManager.createNativeQuery("delete from room_images where room_id = ?1")
+                    .setParameter(1, id)
                     .executeUpdate();
         } catch (Exception ex) {
             // Ignore cleanup failures for environments where the legacy room_images table is absent.
@@ -112,6 +112,18 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(readOnly = true)
     public long countOccupiedRooms() {
         return roomRepository.countByStatus(RoomStatus.OCCUPIED);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countReservedRooms() {
+        return roomRepository.countByStatus(RoomStatus.RESERVED);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countMaintenanceRooms() {
+        return roomRepository.countByStatus(RoomStatus.MAINTENANCE);
     }
 
     @Override

@@ -5,7 +5,7 @@
 <div class="app-shell">
     <aside class="sidebar collapse d-lg-block" id="sidebarCollapse" th:replace="~{fragments/layout :: sidebar('rooms')}"></aside>
     <div class="content-shell">
-        <header th:replace="~{fragments/layout :: topbar('Rooms Management')}"></header>
+        <header th:replace="~{fragments/layout :: topbar('Rooms Management', @{/rooms}, ${search}, 'Search rooms, type, status...')}"></header>
 
         <main class="page-body">
             <section class="section-topbar glass-card">

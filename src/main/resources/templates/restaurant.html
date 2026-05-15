@@ -1,82 +1,111 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant - Lodgings Resto</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/app.css}">
-    <script th:src="@{/js/app.js}"></script>
-</head>
+<head th:replace="~{fragments/layout :: head('Restaurant | Lodgings Resto')}"></head>
 <body>
 <div class="app-shell">
+    <aside class="sidebar collapse d-lg-block" id="sidebarCollapse" th:replace="~{fragments/layout :: sidebar('restaurant')}"></aside>
     <div class="content-shell">
-        <header class="topbar"><h1 class="page-title">Restaurant</h1></header>
+        <header th:replace="~{fragments/layout :: topbar('Restaurant', @{/restaurant}, ${search}, 'Search menu items...')}"></header>
         <main class="page-body">
-            <section class="glass-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h3>Menu</h3>
+            <section class="glass-card p-4 mb-4">
+                <div class="section-header">
+                    <div>
+                        <div class="eyebrow">Menu management</div>
+                        <h2 class="mb-0">Categories & dishes</h2>
+                    </div>
                     <div>
                         <a href="#addCategory" class="btn btn-outline-light me-2" data-bs-toggle="modal">Add Category</a>
                         <a href="#addItem" class="btn btn-premium" data-bs-toggle="modal">Add Item</a>
                     </div>
                 </div>
-                <div class="mt-3">
-                    <div th:each="c : ${categories}">
-                        <h5 th:text="${c.name}">Category</h5>
-                        <div class="row g-3">
-                            <div class="col-12 col-md-4" th:each="i : ${c.items}">
-                                <div class="glass-card p-3">
-                                    <div class="d-flex justify-content-between">
-                                        <div>
-                                            <div class="fw-semibold" th:text="${i.name}">Item</div>
-                                            <div class="small text-muted" th:text="${i.description}">Desc</div>
-                                        </div>
-                                        <div class="text-end">
-                                            <div class="fw-bold" th:text="${i.price}">$0</div>
-                                        </div>
+                <div class="mt-4" th:each="c : ${categories}">
+                    <h4 class="mb-3" th:text="${c.name}">Category</h4>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4" th:each="i : ${menuItems}" th:if="${i.category != null and i.category.id == c.id}">
+                            <div class="glass-card p-3 h-100">
+                                <div class="d-flex justify-content-between align-items-start gap-3">
+                                    <div>
+                                        <div class="fw-semibold" th:text="${i.name}">Item</div>
+                                        <div class="small text-muted" th:text="${i.description}">Desc</div>
                                     </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold price-cell" th:text="${i.price}">$0</div>
+                                    </div>
+                                </div>
+                                <div class="action-group mt-3 justify-content-end">
+                                    <a th:href="@{/restaurant/{id}/edit(id=${i.id})}" class="btn btn-edit btn-action"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <form th:action="@{/restaurant/items/{id}/delete(id=${i.id})}" method="post" onsubmit="return confirm('Delete this menu item?');">
+                                        <button class="btn btn-delete btn-action" type="submit"><i class="fa-solid fa-trash"></i></button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
+
+            <section class="glass-card p-4 mt-4">
+                <div class="section-header mb-3">
+                    <div>
+                        <div class="eyebrow">Orders</div>
+                        <h2 class="mb-0">Recent restaurant orders</h2>
+                    </div>
+                </div>
+                <div class="table-responsive premium-table-wrap">
+                    <table class="table premium-table mb-0">
+                        <thead><tr><th>Order #</th><th>Created</th><th>Status</th><th>Total</th></tr></thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(orders)}"><td colspan="4" class="text-center py-5">No orders found.</td></tr>
+                        <tr th:each="o : ${orders}">
+                            <td data-label="Order #" th:text="${o.id}">1</td>
+                            <td data-label="Created" th:text="${o.createdAt}">Now</td>
+                            <td data-label="Status" th:text="${o.status}">PENDING</td>
+                            <td data-label="Total" th:text="${o.total}">$0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </main>
     </div>
 </div>
 
-<!-- Modals for category/item (simplified) -->
 <div class="modal fade" id="addCategory" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <form th:action="@{/restaurant/categories}" method="post">
-                <div class="modal-header"><h5 class="modal-title">Add Category</h5></div>
-                <div class="modal-body"><input type="text" name="name" class="form-control" required/></div>
-                <div class="modal-footer"><button class="btn btn-premium" type="submit">Add</button></div>
+        <div class="modal-content premium-modal p-3">
+            <form th:action="@{/restaurant/categories}" method="post" th:object="${category}">
+                <div class="modal-header border-0"><h5 class="modal-title">Add Category</h5></div>
+                <div class="modal-body"><input th:field="*{name}" type="text" class="form-control form-control-premium" required/></div>
+                <div class="modal-footer border-0"><button class="btn btn-premium" type="submit">Add</button></div>
             </form>
         </div>
     </div>
 </div>
 
 <div class="modal fade" id="addItem" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form th:action="@{/restaurant/items}" method="post">
-                <div class="modal-header"><h5 class="modal-title">Add Item</h5></div>
-                <div class="modal-body">
-                    <input type="text" name="name" class="form-control mb-2" placeholder="Name" required/>
-                    <textarea name="description" class="form-control mb-2" placeholder="Description"></textarea>
-                    <input type="number" step="0.01" name="price" class="form-control" placeholder="Price" required/>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content premium-modal p-3">
+            <form th:action="@{/restaurant/items}" method="post" th:object="${menuItem}">
+                <div class="modal-header border-0"><h5 class="modal-title">Add Item</h5></div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-6"><input th:field="*{name}" type="text" class="form-control form-control-premium" placeholder="Name" required/></div>
+                    <div class="col-md-6">
+                        <select name="categoryId" class="form-select form-select-premium" required>
+                            <option value="">Select category</option>
+                            <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
+                        </select>
+                    </div>
+                    <div class="col-12"><textarea th:field="*{description}" class="form-control textarea-premium" placeholder="Description"></textarea></div>
+                    <div class="col-12"><input th:field="*{price}" type="number" step="0.01" class="form-control form-control-premium" placeholder="Price" required/></div>
                 </div>
-                <div class="modal-footer"><button class="btn btn-premium" type="submit">Add Item</button></div>
+                <div class="modal-footer border-0"><button class="btn btn-premium" type="submit">Add Item</button></div>
             </form>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<div th:replace="~{fragments/layout :: flashToasts}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>
 

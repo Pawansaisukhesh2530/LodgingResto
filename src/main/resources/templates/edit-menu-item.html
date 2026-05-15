@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Edit Menu Item | Lodgings Resto')}"></head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar collapse d-lg-block" id="sidebarCollapse" th:replace="~{fragments/layout :: sidebar('restaurant')}"></aside>
+    <div class="content-shell">
+        <header th:replace="~{fragments/layout :: topbar('Edit Menu Item', @{/restaurant}, null, null)}"></header>
+        <main class="page-body">
+            <section class="glass-card p-4 form-card mx-auto">
+                <div class="section-header mb-4">
+                    <div>
+                        <div class="eyebrow">Menu update</div>
+                        <h2 class="mb-0">Edit menu item</h2>
+                    </div>
+                    <a th:href="@{/restaurant}" class="btn btn-outline-light btn-back-link">Back to Restaurant</a>
+                </div>
+                <form th:action="@{/restaurant/items/{id}(id=${menuItem.id})}" th:object="${menuItem}" method="post" class="row g-3">
+                    <input type="hidden" name="_method" value="put">
+                    <div class="col-md-6"><input th:field="*{name}" class="form-control form-control-premium" placeholder="Name"></div>
+                    <div class="col-md-6">
+                        <select name="categoryId" class="form-select form-select-premium" required>
+                            <option value="">Select category</option>
+                            <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}" th:selected="${menuItem.category != null and menuItem.category.id == c.id}"></option>
+                        </select>
+                    </div>
+                    <div class="col-12"><textarea th:field="*{description}" class="form-control textarea-premium" placeholder="Description"></textarea></div>
+                    <div class="col-12"><input th:field="*{price}" type="number" step="0.01" class="form-control form-control-premium" placeholder="Price"></div>
+                    <div class="col-12 text-end"><button class="btn btn-premium" type="submit">Update Item</button></div>
+                </form>
+            </section>
+        </main>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: flashToasts}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
+

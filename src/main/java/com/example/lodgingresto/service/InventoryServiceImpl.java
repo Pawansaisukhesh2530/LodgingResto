@@ -25,6 +25,15 @@ public class InventoryServiceImpl implements InventoryService {
     public InventoryItem addItem(InventoryItem item) { return itemRepository.save(item); }
 
     @Override
+    public InventoryItem addItem(InventoryItem item, Long supplierId) {
+        if (supplierId != null) {
+            item.setSupplier(supplierRepository.findById(supplierId)
+                    .orElseThrow(() -> new IllegalArgumentException("Supplier not found")));
+        }
+        return addItem(item);
+    }
+
+    @Override
     public InventoryItem updateItem(Long id, InventoryItem item) {
         InventoryItem existing = itemRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Item not found"));
         existing.setName(item.getName());
@@ -35,10 +44,32 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    public InventoryItem updateItem(Long id, InventoryItem item, Long supplierId) {
+        item.setSupplier(supplierId == null ? null : supplierRepository.findById(supplierId)
+                .orElseThrow(() -> new IllegalArgumentException("Supplier not found")));
+        return updateItem(id, item);
+    }
+
+    @Override
     public void deleteItem(Long id) { itemRepository.deleteById(id); }
 
     @Override
     public List<InventoryItem> getAllItems() { return itemRepository.findAll(); }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<InventoryItem> searchItems(String search) {
+        String normalized = search == null ? "" : search.trim().toLowerCase();
+        if (normalized.isEmpty()) {
+            return getAllItems();
+        }
+        return itemRepository.findAll().stream()
+                .filter(item -> contains(item.getName(), normalized)
+                        || contains(item.getDescription(), normalized)
+                        || (item.getSupplier() != null && contains(item.getSupplier().getName(), normalized))
+                        || String.valueOf(item.getQuantity()).contains(normalized))
+                .toList();
+    }
 
     @Override
     public List<InventoryItem> getLowStockItems(int threshold) { return itemRepository.findByQuantityLessThan(threshold); }
@@ -48,5 +79,9 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public List<Supplier> getAllSuppliers() { return supplierRepository.findAll(); }
+
+    private boolean contains(String value, String search) {
+        return value != null && value.toLowerCase().contains(search);
+    }
 }
 

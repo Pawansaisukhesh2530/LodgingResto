@@ -36,12 +36,14 @@ function renderRoomChart() {
     if (!canvas || typeof Chart === 'undefined') return;
 
     const ctx = canvas.getContext('2d');
+    const labels = String(canvas.dataset.labels || 'Available|Occupied|Reserved|Maintenance').split('|');
+    const values = String(canvas.dataset.values || '0|0|0|0').split('|').map((value) => Number(value) || 0);
     new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['Available', 'Occupied', 'Reserved', 'Maintenance'],
+            labels,
             datasets: [{
-                data: [42, 26, 14, 8],
+                data: values,
                 backgroundColor: ['#16a34a', '#ef4444', '#3b82f6', '#f59e0b'],
                 borderWidth: 0,
                 hoverOffset: 8

@@ -27,6 +27,10 @@ public interface RoomService {
 
     long countOccupiedRooms();
 
+    long countReservedRooms();
+
+    long countMaintenanceRooms();
+
     java.math.BigDecimal calculateRevenue();
 }
 

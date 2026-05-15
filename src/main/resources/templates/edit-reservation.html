@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Edit Reservation | Lodgings Resto')}"></head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar collapse d-lg-block" id="sidebarCollapse" th:replace="~{fragments/layout :: sidebar('reservations')}"></aside>
+    <div class="content-shell">
+        <header th:replace="~{fragments/layout :: topbar('Edit Reservation', @{/reservations}, null, null)}"></header>
+        <main class="page-body">
+            <section class="glass-card p-4 form-card mx-auto">
+                <div class="section-header mb-4">
+                    <div>
+                        <div class="eyebrow">Reservation update</div>
+                        <h2 class="mb-0">Edit reservation</h2>
+                    </div>
+                    <a th:href="@{/reservations}" class="btn btn-outline-light btn-back-link">Back to Reservations</a>
+                </div>
+                <form th:action="@{/reservations/{id}(id=${reservation.id})}" th:object="${reservation}" method="post" class="row g-3">
+                    <input type="hidden" name="_method" value="put">
+                    <div class="col-md-6">
+                        <select name="guestId" class="form-select form-select-premium" required>
+                            <option value="">Select guest</option>
+                            <option th:each="guest : ${guests}" th:value="${guest.id}" th:text="${guest.fullName}" th:selected="${reservation.guest != null and reservation.guest.id == guest.id}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <select name="roomId" class="form-select form-select-premium" required>
+                            <option value="">Select room</option>
+                            <option th:each="room : ${rooms}" th:value="${room.id}" th:text="${room.roomNumber}" th:selected="${reservation.room != null and reservation.room.id == room.id}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-4"><input th:field="*{checkInDate}" type="date" class="form-control form-control-premium"></div>
+                    <div class="col-md-4"><input th:field="*{checkOutDate}" type="date" class="form-control form-control-premium"></div>
+                    <div class="col-md-2"><input th:field="*{totalGuests}" type="number" min="1" class="form-control form-control-premium"></div>
+                    <div class="col-md-2"><input th:field="*{paymentStatus}" class="form-control form-control-premium"></div>
+                    <div class="col-12 text-end"><button class="btn btn-premium" type="submit">Update Reservation</button></div>
+                </form>
+            </section>
+        </main>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: flashToasts}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

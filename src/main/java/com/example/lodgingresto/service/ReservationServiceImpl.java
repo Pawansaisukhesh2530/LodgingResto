@@ -1,7 +1,9 @@
 package com.example.lodgingresto.service;
 
 import com.example.lodgingresto.model.Reservation;
+import com.example.lodgingresto.repository.GuestRepository;
 import com.example.lodgingresto.repository.ReservationRepository;
+import com.example.lodgingresto.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,14 +15,25 @@ import java.util.Optional;
 public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepository reservationRepository;
+    private final GuestRepository guestRepository;
+    private final RoomRepository roomRepository;
 
-    public ReservationServiceImpl(ReservationRepository reservationRepository) {
+    public ReservationServiceImpl(ReservationRepository reservationRepository, GuestRepository guestRepository, RoomRepository roomRepository) {
         this.reservationRepository = reservationRepository;
+        this.guestRepository = guestRepository;
+        this.roomRepository = roomRepository;
     }
 
     @Override
     public Reservation createReservation(Reservation reservation) {
         return reservationRepository.save(reservation);
+    }
+
+    @Override
+    public Reservation createReservation(Reservation reservation, Long guestId, Long roomId) {
+        reservation.setGuest(guestRepository.findById(guestId).orElseThrow(() -> new IllegalArgumentException("Guest not found")));
+        reservation.setRoom(roomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Room not found")));
+        return createReservation(reservation);
     }
 
     @Override
@@ -36,6 +49,13 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    public Reservation updateReservation(Long id, Reservation reservation, Long guestId, Long roomId) {
+        reservation.setGuest(guestRepository.findById(guestId).orElseThrow(() -> new IllegalArgumentException("Guest not found")));
+        reservation.setRoom(roomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Room not found")));
+        return updateReservation(id, reservation);
+    }
+
+    @Override
     public void deleteReservation(Long id) {
         reservationRepository.deleteById(id);
     }
@@ -48,8 +68,29 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Reservation> searchReservations(String search) {
+        String normalized = search == null ? "" : search.trim().toLowerCase();
+        if (normalized.isEmpty()) {
+            return getAllReservations();
+        }
+        return reservationRepository.findAll().stream()
+                .filter(reservation -> contains(reservation.getGuest() != null ? reservation.getGuest().getFullName() : null, normalized)
+                        || contains(reservation.getRoom() != null ? reservation.getRoom().getRoomNumber() : null, normalized)
+                        || contains(reservation.getPaymentStatus(), normalized)
+                        || String.valueOf(reservation.getTotalGuests()).contains(normalized)
+                        || String.valueOf(reservation.getCheckInDate()).contains(normalized)
+                        || String.valueOf(reservation.getCheckOutDate()).contains(normalized))
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<Reservation> getReservationById(Long id) {
         return reservationRepository.findById(id);
+    }
+
+    private boolean contains(String value, String search) {
+        return value != null && value.toLowerCase().contains(search);
     }
 }
 

@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -24,22 +26,57 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("employees", employeeService.getAllEmployees());
-        return "employees";
-    }
-
-    @GetMapping("/new")
-    public String newForm(Model model) {
+    public String list(@RequestParam(required = false) String search, Model model) {
+        model.addAttribute("employees", employeeService.searchEmployees(search));
+        model.addAttribute("search", search);
         model.addAttribute("employee", new Employee());
         return "employees";
     }
 
+    @GetMapping("/new")
+    public String newEmployee(Model model) {
+        model.addAttribute("employee", new Employee());
+        model.addAttribute("employees", employeeService.getAllEmployees());
+        return "employees";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable Long id, Model model, RedirectAttributes ra) {
+        return employeeService.getEmployeeById(id)
+                .map(employee -> {
+                    model.addAttribute("employee", employee);
+                    model.addAttribute("employees", employeeService.getAllEmployees());
+                    return "edit-employee";
+                })
+                .orElseGet(() -> {
+                    ra.addFlashAttribute("errorMessage", "Employee not found.");
+                    return "redirect:/employees";
+                });
+    }
+
     @PostMapping
-    public String create(@Valid @ModelAttribute Employee employee, BindingResult br, RedirectAttributes ra) {
-        if (br.hasErrors()) return "employees";
+    public String create(@Valid @ModelAttribute("employee") Employee employee, BindingResult br, Model model, RedirectAttributes ra) {
+        if (br.hasErrors()) {
+            model.addAttribute("employees", employeeService.getAllEmployees());
+            return "employees";
+        }
         employeeService.createEmployee(employee);
         ra.addFlashAttribute("successMessage", "Employee added");
+        return "redirect:/employees";
+    }
+
+    @PutMapping("/{id}")
+    public String update(@PathVariable Long id,
+                         @Valid @ModelAttribute("employee") Employee employee,
+                         BindingResult br,
+                         Model model,
+                         RedirectAttributes ra) {
+        if (br.hasErrors()) {
+            model.addAttribute("employees", employeeService.getAllEmployees());
+            return "edit-employee";
+        }
+        employeeService.updateEmployee(id, employee);
+        ra.addFlashAttribute("successMessage", "Employee updated");
         return "redirect:/employees";
     }
 
