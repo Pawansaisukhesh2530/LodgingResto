@@ -14,20 +14,17 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final UserServiceImpl userService;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
-    public SecurityConfig(UserServiceImpl userService) {
+    public SecurityConfig(UserServiceImpl userService, org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
         this.userService = userService;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider(userService);
-        auth.setPasswordEncoder(passwordEncoder());
+        auth.setPasswordEncoder(passwordEncoder);
         return auth;
     }
 
@@ -55,5 +52,6 @@ public class SecurityConfig {
         return http.build();
     }
 }
+
 
 
