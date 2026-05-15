@@ -135,7 +135,7 @@ public class DashboardController {
     public String deleteRoom(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             logger.info("Attempting to delete room with ID: {}", id);
-
+            
             // Check if room exists
             if (roomService.getRoomById(id).isEmpty()) {
                 logger.warn("Room with ID {} not found for deletion", id);
@@ -147,7 +147,7 @@ public class DashboardController {
             roomService.deleteRoom(id);
             logger.info("Room with ID {} deleted successfully", id);
             redirectAttributes.addFlashAttribute("successMessage", "Room deleted successfully.");
-
+            
         } catch (IllegalArgumentException ex) {
             logger.error("Illegal argument error while deleting room with ID {}: {}", id, ex.getMessage());
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
@@ -155,7 +155,7 @@ public class DashboardController {
             logger.error("Unexpected error while deleting room with ID {}", id, ex);
             redirectAttributes.addFlashAttribute("errorMessage", "An error occurred while deleting the room: " + ex.getMessage());
         }
-
+        
         return "redirect:/rooms";
     }
 
