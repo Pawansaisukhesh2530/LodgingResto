@@ -21,17 +21,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider auth = new DaoAuthenticationProvider(userService);
-        auth.setPasswordEncoder(passwordEncoder);
-        return auth;
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/login", "/error", "/access-denied").permitAll()
+                        .requestMatchers("/api/**", "/api-dashboard").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/dashboard", "/rooms/**", "/reservations/**", "/guests/**", "/billing/**")
                         .hasAnyRole("ADMIN", "RECEPTIONIST", "MANAGER")
                         .requestMatchers("/restaurant/**").hasAnyRole("ADMIN", "RESTAURANT_STAFF", "MANAGER")
@@ -55,7 +52,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .csrf(csrf -> csrf.disable());
 
-        http.authenticationProvider(authenticationProvider());
+        http.authenticationProvider(authProvider);
         return http.build();
     }
 }

@@ -30,6 +30,7 @@
         <a th:href="@{/employees}" th:classappend="${active == 'employees'} ? ' active' : ''" class="nav-link-item"><i class="fa-solid fa-people-roof"></i><span>Employees</span></a>
         <a th:href="@{/inventory}" th:classappend="${active == 'inventory'} ? ' active' : ''" class="nav-link-item"><i class="fa-solid fa-boxes-stacked"></i><span>Inventory</span></a>
         <a th:href="@{/reports}" th:classappend="${active == 'reports'} ? ' active' : ''" class="nav-link-item"><i class="fa-solid fa-chart-line"></i><span>Reports</span></a>
+        <a th:href="@{/api-dashboard}" th:classappend="${active == 'api-dashboard'} ? ' active' : ''" class="nav-link-item"><i class="fa-solid fa-plug"></i><span>API Dashboard</span></a>
         <a th:href="@{/notifications}" th:classappend="${active == 'notifications'} ? ' active' : ''" class="nav-link-item"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
         <form th:action="@{/logout}" method="post" class="mt-2">
             <button type="submit" class="nav-link-item nav-link-placeholder w-100 text-start border-0 bg-transparent"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></button>
