@@ -52,8 +52,8 @@ public class BillingController {
 
     @PostMapping
     public String createInvoice(@ModelAttribute("invoice") Invoice invoice,
-                                @RequestParam(required = false) Long reservationId,
-                                @RequestParam(required = false) Long orderId,
+                                @RequestParam(name = "reservationId", required = false) Long reservationId,
+                                @RequestParam(name = "orderId", required = false) Long orderId,
                                 RedirectAttributes ra) {
         billingService.createInvoice(invoice, reservationId, orderId);
         ra.addFlashAttribute("successMessage", "Invoice generated successfully.");
@@ -61,7 +61,7 @@ public class BillingController {
     }
 
     @GetMapping("/{id}")
-    public String printableInvoice(@PathVariable Long id, Model model) {
+    public String printableInvoice(@PathVariable("id") Long id, Model model) {
         return billingService.getInvoiceById(id)
                 .map(invoice -> {
                     model.addAttribute("invoice", invoice);

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('AI Assistant | Lodgings Resto')}"></head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar collapse d-lg-block" id="sidebarCollapse" th:replace="~{fragments/layout :: sidebar('ai-assistant')}"></aside>
+    <div class="content-shell">
+        <header th:replace="~{fragments/layout :: topbar('Smart AI Operations Assistant', null, null, null)}"></header>
+
+        <main class="page-body">
+            <!-- AI Header Banner -->
+            <section class="glass-card mb-4 p-4 d-flex align-items-center justify-content-between flex-wrap gap-3" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-color: rgba(212, 175, 55, 0.15);">
+                <div>
+                    <div class="eyebrow"><span class="neon-pulse-dot me-2 bg-warning"></span>Real-time Co-pilot</div>
+                    <h2 class="mb-1 text-white">Smart Hotel & Restaurant Assistant</h2>
+                    <p class="text-white-50 mb-0 small">Context-aware recommendations driven by GROQ LLM and local database signals.</p>
+                </div>
+                <div class="status-chip" style="background: rgba(212, 175, 55, 0.08); border-color: rgba(212, 175, 55, 0.2); color: #d4af37;">
+                    <i class="fa-solid fa-brain me-1"></i> Groq Llama-3.3 Online
+                </div>
+            </section>
+
+            <!-- Main Chat Interface -->
+            <section class="row g-4">
+                <div class="col-12 col-xl-9 mx-auto">
+                    <div class="glass-card chat-widget-card d-flex flex-column" style="height: 600px; padding: 24px;">
+                        <!-- Chat Header Info -->
+                        <div class="chat-header d-flex align-items-center gap-3 border-bottom pb-3 mb-3">
+                            <div class="assistant-avatar"><i class="fa-solid fa-robot"></i></div>
+                            <div>
+                                <h4 class="mb-0 fs-5 text-dark">Lodgings Co-pilot</h4>
+                                <p class="text-muted mb-0 small">Ask about rooms, restaurant menus, booking status or stock details.</p>
+                            </div>
+                        </div>
+
+                        <!-- Chat Messages Screen -->
+                        <div class="chat-messages-screen flex-grow-1 overflow-y-auto px-2" id="chatScreen">
+                            <!-- Initial Welcome message -->
+                            <div class="chat-bubble-container assistant-bubble">
+                                <div class="message-card">
+                                    <div class="message-header"><i class="fa-solid fa-robot me-1 text-warning"></i> Lodgings Co-pilot • Active</div>
+                                    <div class="message-content">
+                                        <p>Hello! I am your premium operational assistant. I can query our room databases, dining menus, and telemetry statistics to assist you.</p>
+                                        <p>Try clicking one of the preset quick queries below or type your inquiry directly in the chat box!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Loader bubble (hidden by default) -->
+                        <div class="chat-bubble-container assistant-bubble d-none" id="aiLoader">
+                            <div class="message-card" style="max-width: 120px; border-color: rgba(212,175,55,0.1); background: rgba(212,175,55,0.03);">
+                                <div class="d-flex align-items-center gap-2 py-1 justify-content-center">
+                                    <span class="chat-dot-loader"></span>
+                                    <span class="chat-dot-loader" style="animation-delay: 0.2s;"></span>
+                                    <span class="chat-dot-loader" style="animation-delay: 0.4s;"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Suggestion Quick Chips -->
+                        <div class="chat-preset-chips d-flex align-items-center gap-2 flex-wrap mb-3 mt-3">
+                            <span class="preset-chip" onclick="sendPreset('Suggest a romantic room under INR 5000')"><i class="fa-solid fa-bed me-1 text-primary"></i> Romantic Room &lt; ₹5k</span>
+                            <span class="preset-chip" onclick="sendPreset('Suggest vegetarian dinner ideas')"><i class="fa-solid fa-leaf me-1 text-success"></i> Vegetarian Dinner</span>
+                            <span class="preset-chip" onclick="sendPreset('What are the booking instructions?')"><i class="fa-solid fa-calendar-days me-1 text-info"></i> How to book rooms</span>
+                            <span class="preset-chip" onclick="sendPreset('Give me occupancy statistics and stock levels')"><i class="fa-solid fa-chart-line me-1 text-warning"></i> Telemetry & Stats</span>
+                        </div>
+
+                        <!-- Chat Input Console -->
+                        <div class="chat-input-bar border-top pt-3">
+                            <form id="chatForm" class="d-flex gap-2">
+                                <input type="text" id="messageInput" class="form-control form-control-premium" placeholder="Ask anything..." autocomplete="off">
+                                <button type="submit" class="btn btn-premium d-flex align-items-center justify-content-center" id="sendBtn" style="height: 54px; width: 60px;">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+<!-- Marked.js for compiled Markdown support inside HTML chatbot card responses -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script>
+    const chatForm = document.getElementById('chatForm');
+    const chatScreen = document.getElementById('chatScreen');
+    const messageInput = document.getElementById('messageInput');
+    const aiLoader = document.getElementById('aiLoader');
+    const sendBtn = document.getElementById('sendBtn');
+
+    chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = messageInput.value.trim();
+        if (!text) return;
+        submitChat(text);
+    });
+
+    function sendPreset(text) {
+        submitChat(text);
+    }
+
+    function submitChat(text) {
+        // 1. Add User Message Bubble
+        appendMessage(text, 'user', 'USER');
+        messageInput.value = '';
+        scrollChat();
+
+        // 2. Show Loader
+        aiLoader.classList.remove('d-none');
+        sendBtn.disabled = true;
+
+        // 3. Dispatch REST Call
+        fetch('/api/ai/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: text })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Chat request failed. HTTP " + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // 4. Hide Loader & Append AI Response Bubble
+            aiLoader.classList.add('d-none');
+            sendBtn.disabled = false;
+            appendMessage(data.response, 'assistant', data.category);
+            scrollChat();
+        })
+        .catch(err => {
+            aiLoader.classList.add('d-none');
+            sendBtn.disabled = false;
+            appendMessage("⚠️ **Error calling AI Co-pilot:**\n" + err.message + "\n\n*Please ensure your database is active and try again.*", 'assistant', 'GENERAL');
+            scrollChat();
+        });
+    }
+
+    function appendMessage(content, role, category) {
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble-container ${role}-bubble`;
+
+        // Style depending on category
+        let headerHtml = `<i class="fa-solid fa-user me-1 text-primary"></i> Operations Staff`;
+        let cardStyle = "";
+        
+        if (role === 'assistant') {
+            let catIcon = "fa-robot text-warning";
+            if (category === 'ROOM') {
+                catIcon = "fa-bed text-primary";
+                cardStyle = "border-left: 4px solid var(--primary); background: rgba(59, 130, 246, 0.02);";
+            } else if (category === 'FOOD') {
+                catIcon = "fa-utensils text-success";
+                cardStyle = "border-left: 4px solid var(--state-available-color); background: rgba(16, 185, 129, 0.02);";
+            } else if (category === 'BOOKING') {
+                catIcon = "fa-calendar-days text-info";
+                cardStyle = "border-left: 4px solid #06b6d4; background: rgba(6, 182, 212, 0.02);";
+            }
+            headerHtml = `<i class="fa-solid ${catIcon} me-1"></i> Lodgings Co-pilot • ${category}`;
+        }
+
+        // Render Markdown using marked.js if available, else plain text
+        let renderedText = content;
+        if (typeof marked !== 'undefined') {
+            renderedText = marked.parse(content);
+        } else {
+            renderedText = content.replace(/\n/g, '<br>');
+        }
+
+        bubble.innerHTML = `
+            <div class="message-card" style="${cardStyle}">
+                <div class="message-header">${headerHtml}</div>
+                <div class="message-content">${renderedText}</div>
+            </div>
+        `;
+        chatScreen.appendChild(bubble);
+    }
+
+    function scrollChat() {
+        chatScreen.scrollTop = chatScreen.scrollHeight;
+    }
+</script>
+
+<style>
+    /* Conversational Chat CSS overrides for maximum SaaS polish */
+    .chat-widget-card {
+        border: 1px solid var(--border-color);
+        background: rgba(255,255,255,0.9);
+        box-shadow: var(--shadow-lg);
+    }
+    .assistant-avatar {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 100%);
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: #070c19;
+        font-size: 1.2rem;
+        box-shadow: 0 4px 12px rgba(212,175,55,0.25);
+    }
+    .chat-bubble-container {
+        display: flex;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .user-bubble {
+        justify-content: flex-end;
+    }
+    .assistant-bubble {
+        justify-content: flex-start;
+    }
+    .message-card {
+        max-width: 82%;
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, 0.07);
+        box-shadow: var(--shadow-sm);
+        border-radius: var(--radius-md);
+        padding: 16px 20px;
+        transition: var(--transition-smooth);
+    }
+    .message-card:hover {
+        box-shadow: var(--shadow-md);
+    }
+    .user-bubble .message-card {
+        background: var(--primary-soft);
+        border-color: rgba(59, 130, 246, 0.15);
+        border-right: 4px solid var(--primary);
+        border-top-right-radius: 4px;
+    }
+    .assistant-bubble .message-card {
+        border-top-left-radius: 4px;
+    }
+    .message-header {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        padding-bottom: 4px;
+    }
+    .message-content {
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        line-height: 1.55;
+    }
+    .message-content p:last-child {
+        margin-bottom: 0;
+    }
+    .message-content table {
+        width: 100%;
+        margin: 12px 0;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+    }
+    .message-content table th {
+        background: #0f172a;
+        color: #fff;
+        padding: 8px 12px;
+        font-weight: 600;
+        text-align: left;
+    }
+    .message-content table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .message-content table tr:last-child td {
+        border-bottom: none;
+    }
+    /* Suggesstion preset chips styling */
+    .preset-chip {
+        cursor: pointer;
+        padding: 8px 14px;
+        background: rgba(15, 23, 42, 0.04);
+        border: 1px solid rgba(15, 23, 42, 0.05);
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        font-weight: 600;
+        border-radius: var(--radius-pill);
+        transition: var(--transition-smooth);
+    }
+    .preset-chip:hover {
+        background: var(--text-primary);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+    /* Typing indicator styling */
+    .chat-dot-loader {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--gold);
+        display: inline-block;
+        animation: typing 1.4s infinite ease-in-out both;
+    }
+    @keyframes typing {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1.0); }
+    }
+    .neon-pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 8px currentColor;
+        animation: pulse-ring 1.8s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+    }
+    @keyframes pulse-ring {
+        0% { transform: scale(0.85); opacity: 0.5; }
+        50% { transform: scale(1.15); opacity: 1; }
+        100% { transform: scale(0.85); opacity: 0.5; }
+    }
+</style>
+</body>
+</html>

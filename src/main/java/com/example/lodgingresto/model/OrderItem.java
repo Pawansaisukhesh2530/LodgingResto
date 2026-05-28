@@ -1,5 +1,6 @@
 package com.example.lodgingresto.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "order_id")
+    @JsonIgnore
     private RestaurantOrder order;
 
     @ManyToOne

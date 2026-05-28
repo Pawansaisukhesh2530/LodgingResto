@@ -6,6 +6,7 @@ import com.example.lodgingresto.model.Guest;
 import com.example.lodgingresto.model.Room;
 import com.example.lodgingresto.model.RoomStatus;
 import com.example.lodgingresto.model.RoomType;
+import com.example.lodgingresto.service.ApiUsageService;
 import com.example.lodgingresto.service.BillingService;
 import com.example.lodgingresto.service.EmployeeService;
 import com.example.lodgingresto.service.GuestService;
@@ -40,7 +41,8 @@ class WebMvcSmokeTests {
                 new EmployeeServiceStub(),
                 new InventoryServiceStub(),
                 new RestaurantServiceStub(),
-                new BillingServiceStub());
+                new BillingServiceStub(),
+                new ApiUsageServiceStub());
 
         Model model = new ExtendedModelMap();
         assertEquals("dashboard", controller.dashboard(model));
@@ -127,6 +129,18 @@ class WebMvcSmokeTests {
         @Override public Optional<com.example.lodgingresto.model.Invoice> getInvoiceById(Long id) { return Optional.empty(); }
         @Override public com.example.lodgingresto.model.Invoice createInvoice(com.example.lodgingresto.model.Invoice invoice, Long reservationId, Long orderId) { return invoice; }
         @Override public BigDecimal getRevenue() { return new BigDecimal("1250.00"); }
+        @Override public BigDecimal getMonthlyRevenue() { return new BigDecimal("450.00"); }
         @Override public BigDecimal getTaxAmount() { return new BigDecimal("225.00"); }
+    }
+
+    private static class ApiUsageServiceStub implements ApiUsageService {
+        @Override public com.example.lodgingresto.model.ApiLog record(com.example.lodgingresto.model.ApiLog log) { return log; }
+        @Override public long totalRequests() { return 50L; }
+        @Override public long successfulRequests() { return 45L; }
+        @Override public long failedRequests() { return 5L; }
+        @Override public List<com.example.lodgingresto.model.ApiLog> recentCalls(int limit) { return Collections.emptyList(); }
+        @Override public List<Object[]> mostUsedEndpoints() { return Collections.emptyList(); }
+        @Override public long averageResponseTimeMs() { return 120L; }
+        @Override public List<Object[]> dailyUsageTelemetry() { return Collections.emptyList(); }
     }
 }

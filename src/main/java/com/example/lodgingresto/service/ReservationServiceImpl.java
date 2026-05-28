@@ -1,6 +1,9 @@
 package com.example.lodgingresto.service;
 
+import com.example.lodgingresto.model.Guest;
 import com.example.lodgingresto.model.Reservation;
+import com.example.lodgingresto.model.Room;
+import com.example.lodgingresto.model.RoomStatus;
 import com.example.lodgingresto.repository.GuestRepository;
 import com.example.lodgingresto.repository.ReservationRepository;
 import com.example.lodgingresto.repository.RoomRepository;
@@ -31,8 +34,12 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public Reservation createReservation(Reservation reservation, Long guestId, Long roomId) {
-        reservation.setGuest(guestRepository.findById(guestId).orElseThrow(() -> new IllegalArgumentException("Guest not found")));
-        reservation.setRoom(roomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Room not found")));
+        Guest guest = guestRepository.findById(guestId).orElseThrow(() -> new IllegalArgumentException("Guest not found"));
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Room not found"));
+        reservation.setGuest(guest);
+        reservation.setRoom(room);
+        room.setStatus(RoomStatus.RESERVED);
+        roomRepository.save(room);
         return createReservation(reservation);
     }
 
@@ -50,13 +57,33 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public Reservation updateReservation(Long id, Reservation reservation, Long guestId, Long roomId) {
-        reservation.setGuest(guestRepository.findById(guestId).orElseThrow(() -> new IllegalArgumentException("Guest not found")));
-        reservation.setRoom(roomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Room not found")));
-        return updateReservation(id, reservation);
+        Reservation existing = reservationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+        Guest guest = guestRepository.findById(guestId).orElseThrow(() -> new IllegalArgumentException("Guest not found"));
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Room not found"));
+
+        if (existing.getRoom() != null && !existing.getRoom().getId().equals(roomId)) {
+            existing.getRoom().setStatus(RoomStatus.AVAILABLE);
+            roomRepository.save(existing.getRoom());
+        }
+        room.setStatus(RoomStatus.RESERVED);
+        roomRepository.save(room);
+
+        existing.setGuest(guest);
+        existing.setRoom(room);
+        existing.setCheckInDate(reservation.getCheckInDate());
+        existing.setCheckOutDate(reservation.getCheckOutDate());
+        existing.setTotalGuests(reservation.getTotalGuests());
+        existing.setPaymentStatus(reservation.getPaymentStatus());
+        return reservationRepository.save(existing);
     }
 
     @Override
     public void deleteReservation(Long id) {
+        Reservation reservation = reservationRepository.findById(id).orElse(null);
+        if (reservation != null && reservation.getRoom() != null) {
+            reservation.getRoom().setStatus(RoomStatus.AVAILABLE);
+            roomRepository.save(reservation.getRoom());
+        }
         reservationRepository.deleteById(id);
     }
 

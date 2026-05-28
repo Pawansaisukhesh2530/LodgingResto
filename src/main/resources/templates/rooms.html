@@ -21,7 +21,7 @@
                 <article class="stat-mini-card"><span>Total</span><strong th:text="${totalRooms}">0</strong></article>
                 <article class="stat-mini-card"><span>Available</span><strong th:text="${availableRooms}">0</strong></article>
                 <article class="stat-mini-card"><span>Occupied</span><strong th:text="${occupiedRooms}">0</strong></article>
-                <article class="stat-mini-card"><span>Revenue</span><strong th:text="${'$' + revenue}">$0</strong></article>
+                <article class="stat-mini-card"><span>Revenue</span><strong th:text="${'₹' + revenue}">₹0</strong></article>
             </section>
 
             <section class="glass-card mt-4">
@@ -82,7 +82,7 @@
                                     <span th:text="${room.roomType.label}">Deluxe</span>
                                 </div>
                             </td>
-                            <td data-label="Price"><span class="price-cell" th:text="${'$' + room.price}">$0.00</span></td>
+                            <td data-label="Price"><span class="price-cell" th:text="${'₹' + room.price}">₹0.00</span></td>
                             <td data-label="Status">
                                 <span class="status-badge" th:classappend="' ' + ${room.status.cssClass}">
                                     <i class="fa-solid" th:classappend="' ' + ${room.status.icon}"></i>

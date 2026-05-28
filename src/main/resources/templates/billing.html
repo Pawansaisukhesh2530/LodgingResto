@@ -16,9 +16,9 @@
                     <span class="badge bg-primary rounded-pill px-3 py-2">Production style</span>
                 </div>
                 <div class="row g-3 mt-2">
-                    <div class="col-md-4"><div class="stat-mini-card"><span>Revenue</span><strong th:text="${revenue}">$0</strong></div></div>
-                    <div class="col-md-4"><div class="stat-mini-card"><span>Tax</span><strong th:text="${tax}">$0</strong></div></div>
-                    <div class="col-md-4"><div class="stat-mini-card"><span>Grand Total</span><strong th:text="${total}">$0</strong></div></div>
+                    <div class="col-md-4"><div class="stat-mini-card"><span>Revenue</span><strong th:text="${'₹' + revenue}">₹0</strong></div></div>
+                    <div class="col-md-4"><div class="stat-mini-card"><span>Tax</span><strong th:text="${'₹' + tax}">₹0</strong></div></div>
+                    <div class="col-md-4"><div class="stat-mini-card"><span>Grand Total</span><strong th:text="${'₹' + total}">₹0</strong></div></div>
                 </div>
             </section>
 
@@ -74,9 +74,9 @@
                             <td data-label="Invoice #" th:text="${i.invoiceNumber}">INV</td>
                             <td data-label="Type" th:text="${i.invoiceType}">ROOM</td>
                             <td data-label="Method" th:text="${i.paymentMethod}">CASH</td>
-                            <td data-label="Subtotal" th:text="${i.subtotal}">$0</td>
-                            <td data-label="Tax" th:text="${i.taxAmount}">$0</td>
-                            <td data-label="Total" th:text="${i.totalAmount}">$0</td>
+                            <td data-label="Subtotal" th:text="${'₹' + i.subtotal}">₹0</td>
+                            <td data-label="Tax" th:text="${'₹' + i.taxAmount}">₹0</td>
+                            <td data-label="Total" th:text="${'₹' + i.totalAmount}">₹0</td>
                         </tr>
                         </tbody>
                     </table>

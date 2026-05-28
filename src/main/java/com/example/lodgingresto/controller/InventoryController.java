@@ -27,19 +27,18 @@ public class InventoryController {
     }
 
     @GetMapping
-    public String index(@RequestParam(required = false) String search, Model model) {
+    public String index(@RequestParam(name = "search", required = false) String search, Model model) {
         model.addAttribute("items", inventoryService.searchItems(search));
         model.addAttribute("lowStock", inventoryService.getLowStockItems(5));
         model.addAttribute("suppliers", inventoryService.getAllSuppliers());
         model.addAttribute("search", search);
         model.addAttribute("item", new InventoryItem());
         model.addAttribute("supplier", new Supplier());
-        model.addAttribute("lowStock", inventoryService.getLowStockItems(5));
         return "inventory";
     }
 
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable Long id, Model model, RedirectAttributes ra) {
+    public String editForm(@PathVariable("id") Long id, Model model, RedirectAttributes ra) {
         return inventoryService.getAllItems().stream().filter(item -> item.getId().equals(id)).findFirst()
                 .map(item -> {
                     model.addAttribute("item", item);
@@ -58,7 +57,7 @@ public class InventoryController {
     @PostMapping("/items")
     public String addItem(@Valid @ModelAttribute("item") InventoryItem item,
                           BindingResult br,
-                          @RequestParam(required = false) Long supplierId,
+                          @RequestParam(name = "supplierId", required = false) Long supplierId,
                           Model model,
                           RedirectAttributes ra) {
         if (br.hasErrors()) {
@@ -74,10 +73,10 @@ public class InventoryController {
     }
 
     @PutMapping("/items/{id}")
-    public String updateItem(@PathVariable Long id,
+    public String updateItem(@PathVariable("id") Long id,
                              @Valid @ModelAttribute("item") InventoryItem item,
                              BindingResult br,
-                             @RequestParam(required = false) Long supplierId,
+                             @RequestParam(name = "supplierId", required = false) Long supplierId,
                              Model model,
                              RedirectAttributes ra) {
         if (br.hasErrors()) {
@@ -93,7 +92,7 @@ public class InventoryController {
     }
 
     @PostMapping("/items/{id}/delete")
-    public String deleteItem(@PathVariable Long id, RedirectAttributes ra) {
+    public String deleteItem(@PathVariable("id") Long id, RedirectAttributes ra) {
         inventoryService.deleteItem(id);
         ra.addFlashAttribute("successMessage", "Inventory item deleted");
         return "redirect:/inventory";

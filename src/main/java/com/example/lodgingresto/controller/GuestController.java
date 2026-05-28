@@ -26,7 +26,7 @@ public class GuestController {
     }
 
     @GetMapping
-    public String listGuests(@RequestParam(required = false) String search, Model model) {
+    public String listGuests(@RequestParam(name = "search", required = false) String search, Model model) {
         model.addAttribute("guests", guestService.searchGuests(search));
         model.addAttribute("search", search);
         model.addAttribute("guest", new Guest());
@@ -41,7 +41,7 @@ public class GuestController {
     }
 
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable Long id, Model model, RedirectAttributes ra) {
+    public String editForm(@PathVariable("id") Long id, Model model, RedirectAttributes ra) {
         return guestService.getGuestById(id)
                 .map(guest -> {
                     model.addAttribute("guest", guest);
@@ -69,7 +69,7 @@ public class GuestController {
     }
 
     @PutMapping("/{id}")
-    public String updateGuest(@PathVariable Long id,
+    public String updateGuest(@PathVariable("id") Long id,
                               @Valid @ModelAttribute("guest") Guest guest,
                               BindingResult bindingResult,
                               Model model,
@@ -84,7 +84,7 @@ public class GuestController {
     }
 
     @PostMapping("/{id}/delete")
-    public String deleteGuest(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteGuest(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         guestService.deleteGuest(id);
         redirectAttributes.addFlashAttribute("successMessage", "Guest deleted successfully.");
         return "redirect:/guests";

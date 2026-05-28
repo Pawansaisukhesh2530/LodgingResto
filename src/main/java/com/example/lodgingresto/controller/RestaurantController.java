@@ -28,8 +28,8 @@ public class RestaurantController {
     }
 
     @GetMapping
-    public String index(@RequestParam(required = false) String search,
-                        @RequestParam(required = false) Long categoryId,
+    public String index(@RequestParam(name = "search", required = false) String search,
+                        @RequestParam(name = "categoryId", required = false) Long categoryId,
                         Model model) {
         model.addAttribute("categories", restaurantService.getAllCategories());
         model.addAttribute("menuItems", restaurantService.searchMenuItems(search, categoryId));
@@ -43,7 +43,7 @@ public class RestaurantController {
     }
 
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable Long id, Model model, RedirectAttributes ra) {
+    public String editForm(@PathVariable("id") Long id, Model model, RedirectAttributes ra) {
         return restaurantService.getMenuItemById(id)
                 .map(item -> {
                     model.addAttribute("menuItem", item);
@@ -78,7 +78,7 @@ public class RestaurantController {
     @PostMapping("/items")
     public String createItem(@Valid @ModelAttribute("menuItem") MenuItem item,
                              BindingResult br,
-                             @RequestParam Long categoryId,
+                             @RequestParam("categoryId") Long categoryId,
                              Model model,
                              RedirectAttributes ra) {
         if (br.hasErrors()) {
@@ -95,10 +95,10 @@ public class RestaurantController {
     }
 
     @PutMapping("/items/{id}")
-    public String updateItem(@PathVariable Long id,
+    public String updateItem(@PathVariable("id") Long id,
                              @Valid @ModelAttribute("menuItem") MenuItem item,
                              BindingResult br,
-                             @RequestParam Long categoryId,
+                             @RequestParam("categoryId") Long categoryId,
                              Model model,
                              RedirectAttributes ra) {
         if (br.hasErrors()) {
@@ -115,7 +115,7 @@ public class RestaurantController {
     }
 
     @PostMapping("/items/{id}/delete")
-    public String deleteItem(@PathVariable Long id, RedirectAttributes ra) {
+    public String deleteItem(@PathVariable("id") Long id, RedirectAttributes ra) {
         restaurantService.deleteMenuItem(id);
         ra.addFlashAttribute("successMessage", "Menu item deleted");
         return "redirect:/restaurant";

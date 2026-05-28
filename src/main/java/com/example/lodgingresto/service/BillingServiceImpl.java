@@ -96,6 +96,18 @@ public class BillingServiceImpl implements BillingService {
 
     @Override
     @Transactional(readOnly = true)
+    public BigDecimal getMonthlyRevenue() {
+        java.time.LocalDate now = java.time.LocalDate.now();
+        java.time.YearMonth currentMonth = java.time.YearMonth.from(now);
+        return invoiceRepository.findAll().stream()
+                .filter(i -> i.getCreatedAt() != null
+                        && java.time.YearMonth.from(i.getCreatedAt().toLocalDate()).equals(currentMonth))
+                .map(Invoice::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public BigDecimal getTaxAmount() {
         return invoiceRepository.findAll().stream()
                 .map(Invoice::getTaxAmount)

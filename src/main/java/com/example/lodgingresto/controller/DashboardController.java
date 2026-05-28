@@ -1,8 +1,6 @@
 package com.example.lodgingresto.controller;
 
-import com.example.lodgingresto.model.Room;
-import com.example.lodgingresto.model.RoomStatus;
-import com.example.lodgingresto.model.RoomType;
+import com.example.lodgingresto.model.*;
 import com.example.lodgingresto.service.BillingService;
 import com.example.lodgingresto.service.EmployeeService;
 import com.example.lodgingresto.service.GuestService;
@@ -10,6 +8,10 @@ import com.example.lodgingresto.service.InventoryService;
 import com.example.lodgingresto.service.ReservationService;
 import com.example.lodgingresto.service.RestaurantService;
 import com.example.lodgingresto.service.RoomService;
+import com.example.lodgingresto.service.ApiUsageService;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,7 @@ public class DashboardController {
     private final InventoryService inventoryService;
     private final RestaurantService restaurantService;
     private final BillingService billingService;
+    private final ApiUsageService apiUsageService;
 
     public DashboardController(RoomService roomService,
                                GuestService guestService,
@@ -47,7 +50,8 @@ public class DashboardController {
                                EmployeeService employeeService,
                                InventoryService inventoryService,
                                RestaurantService restaurantService,
-                               BillingService billingService) {
+                               BillingService billingService,
+                               ApiUsageService apiUsageService) {
         this.roomService = roomService;
         this.guestService = guestService;
         this.reservationService = reservationService;
@@ -55,37 +59,126 @@ public class DashboardController {
         this.inventoryService = inventoryService;
         this.restaurantService = restaurantService;
         this.billingService = billingService;
+        this.apiUsageService = apiUsageService;
     }
 
     @GetMapping({"/", "/dashboard"})
     public String dashboard(Model model) {
         addCommonAttributes(model);
-        model.addAttribute("totalRooms", roomService.countAllRooms());
-        model.addAttribute("availableRooms", roomService.countAvailableRooms());
-        model.addAttribute("occupiedRooms", roomService.countOccupiedRooms());
-        model.addAttribute("reservedRooms", roomService.countReservedRooms());
-        model.addAttribute("maintenanceRooms", roomService.countMaintenanceRooms());
-        model.addAttribute("totalGuests", guestService.getAllGuests().size());
-        model.addAttribute("totalReservations", reservationService.getAllReservations().size());
-        model.addAttribute("employeeCount", employeeService.getAllEmployees().size());
-        model.addAttribute("inventoryAlerts", inventoryService.getLowStockItems(5).size());
-        model.addAttribute("revenue", billingService.getRevenue());
-        model.addAttribute("restaurantSales", restaurantService.getAllOrders().stream()
-                .map(order -> order.getTotal() == null ? BigDecimal.ZERO : order.getTotal())
-                .reduce(BigDecimal.ZERO, BigDecimal::add));
+
+        long totalRoomsCount = roomService.countAllRooms();
+        long availableRoomsCount = roomService.countAvailableRooms();
+        long occupiedRoomsCount = roomService.countOccupiedRooms();
+        long reservedRoomsCount = roomService.countReservedRooms();
+        long maintenanceRoomsCount = roomService.countMaintenanceRooms();
+
+        long totalGuestsCount = guestService.getAllGuests().size();
+        BigDecimal revenueAmount = billingService.getRevenue();
+        long apiRequestsCount = apiUsageService.totalRequests();
+        BigDecimal monthlyRevenue = billingService.getMonthlyRevenue();
+        long inventoryAlertsCount = inventoryService.getLowStockItems(5).size();
+
+        List<Reservation> allReservations = reservationService.getAllReservations();
+        long totalReservationsCount = allReservations.size();
+        long pendingPaymentsCount = allReservations.stream()
+                .filter(r -> "PENDING".equalsIgnoreCase(r.getPaymentStatus()))
+                .count();
+        long paidCount = allReservations.stream()
+                .filter(r -> "PAID".equalsIgnoreCase(r.getPaymentStatus()))
+                .count();
+        long otherResCount = allReservations.size() - paidCount - pendingPaymentsCount;
+
+        List<RestaurantOrder> allOrders = restaurantService.getAllOrders();
+        long restaurantOrdersCount = allOrders.size();
+
+        List<Invoice> allInvoices = billingService.getAllInvoices();
+
+        List<InventoryItem> allItems = inventoryService.getAllItems();
+        allItems.sort(Comparator.comparingInt(InventoryItem::getQuantity));
+
+        model.addAttribute("monthlyRevenue", monthlyRevenue);
+        model.addAttribute("totalRooms", totalRoomsCount);
+        model.addAttribute("availableRooms", availableRoomsCount);
+        model.addAttribute("occupiedRooms", occupiedRoomsCount);
+        model.addAttribute("reservedRooms", reservedRoomsCount);
+        model.addAttribute("maintenanceRooms", maintenanceRoomsCount);
+        model.addAttribute("totalGuests", totalGuestsCount);
+        model.addAttribute("totalReservations", totalReservationsCount);
+        model.addAttribute("restaurantOrders", restaurantOrdersCount);
+        model.addAttribute("revenue", revenueAmount);
+        model.addAttribute("apiRequests", apiRequestsCount);
+        model.addAttribute("pendingPayments", pendingPaymentsCount);
+        model.addAttribute("inventoryAlerts", inventoryAlertsCount);
+
+        List<Reservation> recentReservations = allReservations.stream()
+                .sorted((a, b) -> (b.getId() != null && a.getId() != null) ? b.getId().compareTo(a.getId()) : 0)
+                .limit(5).toList();
+        List<RestaurantOrder> recentOrders = allOrders.stream()
+                .sorted((a, b) -> (b.getId() != null && a.getId() != null) ? b.getId().compareTo(a.getId()) : 0)
+                .limit(5).toList();
+        List<Invoice> recentInvoices = allInvoices.stream()
+                .sorted((a, b) -> (b.getId() != null && a.getId() != null) ? b.getId().compareTo(a.getId()) : 0)
+                .limit(5).toList();
+        List<ApiLog> recentApiLogs = apiUsageService.recentCalls(5);
+
+        model.addAttribute("recentReservations", recentReservations);
+        model.addAttribute("recentOrders", recentOrders);
+        model.addAttribute("recentInvoices", recentInvoices);
+        model.addAttribute("recentApiLogs", recentApiLogs);
+
+        allInvoices.sort(Comparator.comparing(Invoice::getCreatedAt));
+        Map<String, BigDecimal> revByMonth = new LinkedHashMap<>();
+        java.time.format.DateTimeFormatter monthFormatter = java.time.format.DateTimeFormatter.ofPattern("MMM yy");
+        for (Invoice inv : allInvoices) {
+            String mName = inv.getCreatedAt().format(monthFormatter);
+            revByMonth.put(mName, revByMonth.getOrDefault(mName, BigDecimal.ZERO).add(inv.getTotalAmount()));
+        }
+        model.addAttribute("revenueChartLabels", String.join("|", revByMonth.keySet()));
+        model.addAttribute("revenueChartValues", revByMonth.values().stream().map(BigDecimal::toString).collect(Collectors.joining("|")));
+
         model.addAttribute("roomChartLabels", "Available|Occupied|Reserved|Maintenance");
-        model.addAttribute("roomChartValues", roomService.countAvailableRooms() + "|" + roomService.countOccupiedRooms() + "|" + roomService.countReservedRooms() + "|" + roomService.countMaintenanceRooms());
-        model.addAttribute("recentGuests", guestService.getAllGuests().stream().sorted(Comparator.comparingLong(guest -> guest.getId() == null ? 0 : guest.getId())).toList());
-        model.addAttribute("recentReservations", reservationService.getAllReservations().stream().sorted(Comparator.comparingLong(res -> res.getId() == null ? 0 : res.getId())).toList());
-        model.addAttribute("recentOrders", restaurantService.getAllOrders().stream().sorted(Comparator.comparingLong(order -> order.getId() == null ? 0 : order.getId())).toList());
-        model.addAttribute("recentInvoices", billingService.getAllInvoices().stream().sorted(Comparator.comparingLong(invoice -> invoice.getId() == null ? 0 : invoice.getId())).toList());
+        model.addAttribute("roomChartValues", availableRoomsCount + "|" + occupiedRoomsCount + "|" + reservedRoomsCount + "|" + maintenanceRoomsCount);
+
+        String resLabels = "Paid|Pending" + (otherResCount > 0 ? "|Other" : "");
+        String resValues = paidCount + "|" + pendingPaymentsCount + (otherResCount > 0 ? "|" + otherResCount : "");
+        model.addAttribute("resChartLabels", resLabels);
+        model.addAttribute("resChartValues", resValues);
+
+        allOrders.sort(Comparator.comparing(RestaurantOrder::getCreatedAt));
+        Map<String, BigDecimal> salesByDay = new LinkedHashMap<>();
+        java.time.format.DateTimeFormatter dayFormatter = java.time.format.DateTimeFormatter.ofPattern("dd MMM");
+        for (RestaurantOrder ord : allOrders) {
+            String dName = ord.getCreatedAt().format(dayFormatter);
+            salesByDay.put(dName, salesByDay.getOrDefault(dName, BigDecimal.ZERO).add(ord.getTotal()));
+        }
+        List<String> rDays = salesByDay.keySet().stream().toList();
+        List<BigDecimal> rSales = salesByDay.values().stream().toList();
+        int limitDays = Math.min(7, rDays.size());
+        String restLabels = "";
+        String restValues = "";
+        if (limitDays > 0) {
+            int startIdx = rDays.size() - limitDays;
+            restLabels = String.join("|", rDays.subList(startIdx, rDays.size()));
+            restValues = rSales.subList(startIdx, rSales.size()).stream().map(BigDecimal::toString).collect(Collectors.joining("|"));
+        }
+        model.addAttribute("restaurantChartLabels", restLabels);
+        model.addAttribute("restaurantChartValues", restValues);
+
+        List<Object[]> apiTelemetry = apiUsageService.dailyUsageTelemetry();
+        model.addAttribute("apiChartLabels", apiTelemetry.stream().map(o -> o[0].toString()).collect(Collectors.joining("|")));
+        model.addAttribute("apiChartValues", apiTelemetry.stream().map(o -> o[1].toString()).collect(Collectors.joining("|")));
+
+        List<InventoryItem> top5Inv = allItems.stream().limit(6).toList();
+        model.addAttribute("inventoryChartLabels", top5Inv.stream().map(InventoryItem::getName).collect(Collectors.joining("|")));
+        model.addAttribute("inventoryChartValues", top5Inv.stream().map(i -> String.valueOf(i.getQuantity())).collect(Collectors.joining("|")));
+
         return "dashboard";
     }
 
     @GetMapping("/rooms")
-    public String rooms(@RequestParam(required = false) String search,
-                        @RequestParam(required = false) RoomType roomType,
-                        @RequestParam(required = false) RoomStatus status,
+    public String rooms(@RequestParam(name = "search", required = false) String search,
+                        @RequestParam(name = "roomType", required = false) RoomType roomType,
+                        @RequestParam(name = "status", required = false) RoomStatus status,
                         Model model) {
         addCommonAttributes(model);
         model.addAttribute("rooms", roomService.getAllRooms(search, roomType, status));
@@ -135,7 +228,7 @@ public class DashboardController {
     }
 
     @GetMapping("/rooms/{id}/edit")
-    public String editRoomForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String editRoomForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
         return roomService.getRoomById(id)
                 .map(room -> {
                     addCommonAttributes(model);
@@ -149,7 +242,7 @@ public class DashboardController {
     }
 
     @PutMapping("/rooms/{id}")
-    public String updateRoom(@PathVariable Long id,
+    public String updateRoom(@PathVariable("id") Long id,
                              @Valid @ModelAttribute("room") Room room,
                              BindingResult bindingResult,
                              Model model,
@@ -176,7 +269,7 @@ public class DashboardController {
     }
 
     @PostMapping("/rooms/{id}/delete")
-    public String deleteRoom(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteRoom(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {
             logger.info("Attempting to delete room with ID: {}", id);
             

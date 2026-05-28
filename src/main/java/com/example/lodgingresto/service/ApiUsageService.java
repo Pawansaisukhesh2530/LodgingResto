@@ -10,5 +10,7 @@ public interface ApiUsageService {
     long failedRequests();
     List<ApiLog> recentCalls(int limit);
     List<Object[]> mostUsedEndpoints();
+    long averageResponseTimeMs();
+    List<Object[]> dailyUsageTelemetry();
 }
 

@@ -23,21 +23,60 @@
 </div>
 <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function(){
-        const ctx = document.getElementById('revenueChart');
-        if (!ctx) return;
+        const canvas = document.getElementById('revenueChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        
+        // Premium linear gradient creation
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.28)');
+        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.01)');
+
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: /*[[${labels}]]*/ ['Jan','Feb','Mar','Apr','May','Jun'],
+                labels: /*[[${revenueChartLabels}]]*/ [],
                 datasets: [{
-                    label: 'Revenue',
-                    data: /*[[${revenueData}]]*/ [1200,1400,1100,1800,1500,2000],
-                    borderColor: '#3867ff',
-                    backgroundColor: 'rgba(56,103,255,0.12)',
-                    tension: 0.3
+                    label: 'Monthly Revenue (₹)',
+                    data: /*[[${revenueChartValues}]]*/ [],
+                    borderColor: '#3b82f6',
+                    backgroundColor: gradient,
+                    borderWidth: 3.5,
+                    tension: 0.38,
+                    fill: true,
+                    pointBackgroundColor: '#3b82f6',
+                    pointHoverRadius: 8
                 }]
             },
-            options: { responsive: true }
+            options: { 
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: { family: "'Inter', sans-serif", size: 12, weight: '500' },
+                            color: '#475569'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        titleColor: '#fff',
+                        bodyColor: '#e2e8f0',
+                        padding: 12,
+                        cornerRadius: 8
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(15, 23, 42, 0.04)' },
+                        ticks: { color: '#64748b', font: { family: "'Inter', sans-serif" } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(15, 23, 42, 0.04)' },
+                        ticks: { color: '#64748b', font: { family: "'Inter', sans-serif" } }
+                    }
+                }
+            }
         });
     });
 </script>

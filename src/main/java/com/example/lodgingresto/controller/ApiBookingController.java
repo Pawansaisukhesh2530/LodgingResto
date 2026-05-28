@@ -89,7 +89,7 @@ public class ApiBookingController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Object>> updateBooking(@PathVariable Long id, @Valid @RequestBody BookingRequest req) {
+    public ResponseEntity<ApiResponse<Object>> updateBooking(@PathVariable("id") Long id, @Valid @RequestBody BookingRequest req) {
         Instant start = Instant.now();
         Reservation existing = reservationService.getReservationById(id).orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
 
@@ -115,6 +115,13 @@ public class ApiBookingController {
             room = candidates.get(0);
         }
 
+        if (existing.getRoom() != null && !existing.getRoom().getId().equals(room.getId())) {
+            existing.getRoom().setStatus(RoomStatus.AVAILABLE);
+            roomRepository.save(existing.getRoom());
+        }
+        room.setStatus(RoomStatus.RESERVED);
+        roomRepository.save(room);
+
         existing.setGuest(guest);
         existing.setRoom(room);
         existing.setCheckInDate(req.getCheckInDate());
@@ -127,11 +134,11 @@ public class ApiBookingController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Object>> cancelBooking(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Object>> cancelBooking(@PathVariable("id") Long id) {
         Instant start = Instant.now();
         reservationService.deleteReservation(id);
-        recordLog("/api/bookings/"+id, "DELETE", start, HttpStatus.NO_CONTENT.value(), null);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse<>("success", "Booking cancelled"));
+        recordLog("/api/bookings/"+id, "DELETE", start, HttpStatus.OK.value(), null);
+        return ResponseEntity.ok(new ApiResponse<>("success", "Booking cancelled"));
     }
 
     private BookingResponse toDto(Reservation r) {

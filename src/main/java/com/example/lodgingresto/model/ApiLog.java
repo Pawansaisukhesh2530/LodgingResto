@@ -2,6 +2,8 @@ package com.example.lodgingresto.model;
 
 import jakarta.persistence.*;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "api_logs")
@@ -43,5 +45,12 @@ public class ApiLog {
     public void setRequestBody(String requestBody) { this.requestBody = requestBody; }
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
+
+    public String getFormattedRequestTime() {
+        if (requestTime == null) return "";
+        return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.systemDefault())
+                .format(requestTime);
+    }
 }
 

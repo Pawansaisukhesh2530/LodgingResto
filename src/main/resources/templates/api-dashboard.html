@@ -1,91 +1,224 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/layout :: head('API Dashboard')"></head>
-<body>
-<div th:replace="fragments/layout :: sidebar('api-dashboard')"></div>
-<div class="main-content p-4">
-    <div th:replace="fragments/layout :: topbar('API Dashboard', null, null, null)"></div>
-    <div class="container-fluid mt-4">
-        <div class="row g-3">
-            <div class="col-md-3">
-                <div class="card p-3">
-                    <div class="small text-muted">Total API Requests</div>
-                    <div class="fs-4 fw-semibold" th:text="${totalRequests}">0</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card p-3">
-                    <div class="small text-muted">Successful Requests</div>
-                    <div class="fs-4 fw-semibold text-success" th:text="${successfulRequests}">0</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card p-3">
-                    <div class="small text-muted">Failed Requests</div>
-                    <div class="fs-4 fw-semibold text-danger" th:text="${failedRequests}">0</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card p-3">
-                    <div class="small text-muted">Most Used Endpoint</div>
-                    <div class="fs-6" th:if="${mostUsed.size()>0}" th:text="${mostUsed[0][0]} + ' (' + ${mostUsed[0][1]} + ')'">/api/bookings</div>
-                    <div class="fs-6" th:if="${mostUsed.size()==0}">-</div>
-                </div>
-            </div>
-        </div>
+<head th:replace="~{fragments/layout :: head('API Dashboard | Lodgings Resto')}"></head>
+<body class="api-dark-theme">
+<div class="app-shell">
+    <aside class="sidebar collapse d-lg-block" id="sidebarCollapse" th:replace="~{fragments/layout :: sidebar('api-dashboard')}"></aside>
+    <div class="content-shell">
+        <header th:replace="~{fragments/layout :: topbar('API Operations Monitor', null, null, null)}"></header>
 
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card p-3">
-                    <canvas id="apiChart" data-labels="Requests" data-values="[[${totalRequests}]]" height="80"></canvas>
+        <main class="page-body">
+            <!-- Neon Heartbeat Banner -->
+            <section class="glass-card mb-4 p-4 d-flex align-items-center justify-content-between flex-wrap gap-3" style="background: rgba(15, 23, 42, 0.7); border-color: rgba(16, 185, 129, 0.15);">
+                <div>
+                    <div class="eyebrow text-success"><span class="neon-pulse-dot me-2"></span>Operational Telemetry</div>
+                    <h2 class="mb-1 text-white">Developer Analytics Console</h2>
+                    <p class="text-muted mb-0 small">Real-time HTTP requests tracking, response signals, and active database triggers.</p>
                 </div>
-            </div>
-        </div>
+                <div class="status-chip" style="background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.2); color: #10b981;">
+                    <i class="fa-solid fa-server me-1"></i> cluster-east-online
+                </div>
+            </section>
 
-        <div class="row mt-4">
-            <div class="col-lg-6">
-                <div class="card p-3">
-                    <h5>Recent API Calls</h5>
-                    <table class="table table-striped mt-3">
-                        <thead><tr><th>Time</th><th>Endpoint</th><th>Method</th><th>Status</th><th>User</th></tr></thead>
-                        <tbody>
-                        <tr th:each="c : ${recentCalls}">
-                            <td th:text="${#dates.format(c.requestTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
-                            <td th:text="${c.endpoint}"></td>
-                            <td th:text="${c.method}"></td>
-                            <td th:text="${c.responseStatus}"></td>
-                            <td th:text="${c.username}"></td>
-                        </tr>
-                        </tbody>
-                    </table>
+            <!-- Metrics Cards Grid (Row Cols 5 Layout) -->
+            <section class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3">
+                <div class="col">
+                    <div class="stat-mini-card h-100" style="background: rgba(15, 23, 42, 0.6); border-color: rgba(255,255,255,0.05);">
+                        <div>
+                            <span class="text-muted small">Total Requests</span>
+                            <h3 class="mt-2 mb-0 fw-bold counter-value text-white" th:attr="data-count=${totalRequests}" th:text="${totalRequests}">0</h3>
+                        </div>
+                        <div class="brand-icon" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="card p-3">
-                    <h5>Endpoints Usage</h5>
-                    <table class="table mt-3">
-                        <thead><tr><th>Endpoint</th><th>Count</th></tr></thead>
-                        <tbody>
-                        <tr th:each="r : ${mostUsed}">
-                            <td th:text="${r[0]}"></td>
-                            <td th:text="${r[1]}"></td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div class="col">
+                    <div class="stat-mini-card h-100" style="background: rgba(15, 23, 42, 0.6); border-color: rgba(255,255,255,0.05);">
+                        <div>
+                            <span class="text-muted small">Success (2xx)</span>
+                            <h3 class="mt-2 mb-0 fw-bold counter-value text-success" th:attr="data-count=${successfulRequests}" th:text="${successfulRequests}">0</h3>
+                        </div>
+                        <div class="brand-icon" style="background: rgba(16, 185, 129, 0.12); color: #10b981;"><i class="fa-solid fa-circle-check"></i></div>
+                    </div>
                 </div>
-            </div>
-        </div>
+                <div class="col">
+                    <div class="stat-mini-card h-100" style="background: rgba(15, 23, 42, 0.6); border-color: rgba(255,255,255,0.05);">
+                        <div>
+                            <span class="text-muted small">Failures (4xx/5xx)</span>
+                            <h3 class="mt-2 mb-0 fw-bold counter-value text-danger" th:attr="data-count=${failedRequests}" th:text="${failedRequests}">0</h3>
+                        </div>
+                        <div class="brand-icon" style="background: rgba(239, 68, 68, 0.12); color: #ef4444;"><i class="fa-solid fa-circle-xmark"></i></div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="stat-mini-card h-100" style="background: rgba(15, 23, 42, 0.6); border-color: rgba(255,255,255,0.05);">
+                        <div>
+                            <span class="text-muted small">Avg Response Time</span>
+                            <h3 class="mt-2 mb-0 fw-bold counter-value text-warning" th:attr="data-count=${averageResponseTime}" th:text="${averageResponseTime + ' ms'}">0 ms</h3>
+                        </div>
+                        <div class="brand-icon" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;"><i class="fa-solid fa-clock"></i></div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="stat-mini-card h-100" style="background: rgba(15, 23, 42, 0.6); border-color: rgba(255,255,255,0.05);">
+                        <div>
+                            <span class="text-muted small">Top Endpoint</span>
+                            <h4 class="mt-2 mb-0 fw-bold text-white font-monospace" style="font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 130px;" th:if="${mostUsed.size()>0}" th:text="${mostUsed[0][0]}">/api/bookings</h4>
+                            <h4 class="mt-2 mb-0 fw-bold text-white" th:if="${mostUsed.size()==0}">-</h4>
+                        </div>
+                        <div class="brand-icon" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;"><i class="fa-solid fa-link"></i></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Line Wave Analytics Graph -->
+            <section class="row mt-4">
+                <div class="col-12">
+                    <div class="glass-card p-4" style="background: rgba(15, 23, 42, 0.4); border-color: rgba(255,255,255,0.04);">
+                        <div class="section-header mb-3">
+                            <div>
+                                <div class="eyebrow text-success">Load telemetry</div>
+                                <h3 class="text-white">API Usage Load Curve (Daily Call Rate)</h3>
+                            </div>
+                        </div>
+                        <div class="chart-wrap" style="min-height: 280px;">
+                            <canvas id="apiChart" th:attr="data-labels=${apiChartLabels},data-values=${apiChartValues}"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Logs Lists -->
+            <section class="row mt-4 g-4">
+                <div class="col-12 col-xl-7">
+                    <div class="glass-card p-4" style="background: rgba(15, 23, 42, 0.4); border-color: rgba(255,255,255,0.04);">
+                        <h4 class="mb-3 text-white"><i class="fa-solid fa-terminal me-2 text-success"></i>Live Traffic Signals</h4>
+                        <div class="table-responsive premium-table-wrap" style="border-color: rgba(255,255,255,0.05);">
+                            <table class="table premium-table mb-0">
+                                <thead>
+                                <tr>
+                                    <th style="background: #090e1a; color: rgba(255,255,255,0.7);">Timestamp</th>
+                                    <th style="background: #090e1a; color: rgba(255,255,255,0.7);">Endpoint</th>
+                                    <th style="background: #090e1a; color: rgba(255,255,255,0.7);">Method</th>
+                                    <th style="background: #090e1a; color: rgba(255,255,255,0.7);">Duration</th>
+                                    <th style="background: #090e1a; color: rgba(255,255,255,0.7);">Status</th>
+                                    <th style="background: #090e1a; color: rgba(255,255,255,0.7);">Identity</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="c : ${recentCalls}">
+                                    <td style="background: rgba(15,23,42,0.2); color: rgba(255,255,255,0.8);" th:text="${c.formattedRequestTime}"></td>
+                                    <td style="background: rgba(15,23,42,0.2);"><code class="text-success" th:text="${c.endpoint}">/api/rooms</code></td>
+                                    <td style="background: rgba(15,23,42,0.2);"><span class="badge bg-secondary px-2 py-1 text-uppercase" th:text="${c.method}">GET</span></td>
+                                    <td style="background: rgba(15,23,42,0.2); color: #fff;" th:text="${c.durationMs + ' ms'}">0 ms</td>
+                                    <td style="background: rgba(15,23,42,0.2);">
+                                        <span class="status-badge py-1 px-2" th:classappend="${c.responseStatus >= 400} ? 'badge-occupied' : 'badge-available'" th:text="${c.responseStatus}">200</span>
+                                    </td>
+                                    <td style="background: rgba(15,23,42,0.2); color: rgba(255,255,255,0.8);" th:text="${c.username}">admin</td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(recentCalls)}">
+                                    <td colspan="6" style="background: rgba(15,23,42,0.2);" class="text-center text-muted">No API request logs recorded.</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-xl-5">
+                    <div class="glass-card p-4" style="background: rgba(15, 23, 42, 0.4); border-color: rgba(255,255,255,0.04);">
+                        <h4 class="mb-3 text-white"><i class="fa-solid fa-chart-bar me-2 text-warning"></i>Endpoint Frequency Map</h4>
+                        <div class="table-responsive premium-table-wrap" style="border-color: rgba(255,255,255,0.05);">
+                            <table class="table premium-table mb-0">
+                                <thead>
+                                <tr>
+                                    <th style="background: #090e1a; color: rgba(255,255,255,0.7);">Target Route</th>
+                                    <th style="background: #090e1a; color: rgba(255,255,255,0.7);" class="text-end">Call Rate</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="r : ${mostUsed}">
+                                    <td style="background: rgba(15,23,42,0.2);"><code class="text-warning" th:text="${r[0]}">/api/bookings</code></td>
+                                    <td style="background: rgba(15,23,42,0.2);" class="text-end fw-bold text-white" th:text="${r[1] + ' calls'}">0 calls</td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(mostUsed)}">
+                                    <td colspan="2" style="background: rgba(15,23,42,0.2);" class="text-center text-muted">No endpoints stats available.</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
     </div>
-    <div th:replace="fragments/layout :: footer"></div>
 </div>
-<div th:replace="fragments/layout :: scripts"></div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
 <script>
-    const canvas = document.getElementById('apiChart');
-    if (canvas) {
+    document.addEventListener('DOMContentLoaded', () => {
+        const canvas = document.getElementById('apiChart');
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        new Chart(ctx, { type: 'doughnut', data: { labels: ['Total'], datasets: [{ data: [Number(canvas.dataset.values || 0)], backgroundColor: ['#4e73df'] }] } });
-    }
+        
+        const rawLabels = String(canvas.dataset.labels || '').split('|');
+        const rawValues = String(canvas.dataset.values || '').split('|').map(v => Number(v) || 0);
+
+        let labels = rawLabels;
+        let dataPoints = rawValues;
+
+        if (!canvas.dataset.labels || rawLabels.length === 1 && rawLabels[0] === "") {
+            labels = [];
+            dataPoints = [];
+        }
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Call Volume',
+                    data: dataPoints,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                    borderWidth: 3,
+                    tension: 0.35,
+                    fill: true,
+                    pointBackgroundColor: '#10b981',
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                        ticks: { color: '#94a3b8', font: { family: "'Inter', sans-serif" } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                        ticks: { color: '#94a3b8', font: { family: "'Inter', sans-serif" } }
+                    }
+                }
+            }
+        });
+    });
 </script>
+<style>
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
 </body>
 </html>
-

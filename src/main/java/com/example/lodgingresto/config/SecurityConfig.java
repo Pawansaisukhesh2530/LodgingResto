@@ -28,7 +28,9 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/login", "/error", "/access-denied").permitAll()
-                        .requestMatchers("/api/**", "/api-dashboard").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/api/ai/chat", "/ai-assistant").hasAnyRole("ADMIN", "RECEPTIONIST", "MANAGER")
+                        .requestMatchers("/api-dashboard").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/dashboard", "/rooms/**", "/reservations/**", "/guests/**", "/billing/**")
                         .hasAnyRole("ADMIN", "RECEPTIONIST", "MANAGER")
                         .requestMatchers("/restaurant/**").hasAnyRole("ADMIN", "RESTAURANT_STAFF", "MANAGER")

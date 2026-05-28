@@ -4,6 +4,8 @@ import com.example.lodgingresto.service.ApiUsageService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class ApiDashboardController {
@@ -21,6 +23,17 @@ public class ApiDashboardController {
         model.addAttribute("failedRequests", apiUsageService.failedRequests());
         model.addAttribute("mostUsed", apiUsageService.mostUsedEndpoints());
         model.addAttribute("recentCalls", apiUsageService.recentCalls(10));
+        
+        long avgTime = apiUsageService.averageResponseTimeMs();
+        model.addAttribute("averageResponseTime", avgTime);
+
+        List<Object[]> telemetry = apiUsageService.dailyUsageTelemetry();
+        String apiChartLabels = telemetry.stream().map(o -> o[0].toString()).collect(Collectors.joining("|"));
+        String apiChartValues = telemetry.stream().map(o -> o[1].toString()).collect(Collectors.joining("|"));
+        
+        model.addAttribute("apiChartLabels", apiChartLabels);
+        model.addAttribute("apiChartValues", apiChartValues);
+
         return "api-dashboard";
     }
 }

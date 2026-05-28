@@ -26,7 +26,7 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public String list(@RequestParam(required = false) String search, Model model) {
+    public String list(@RequestParam(name = "search", required = false) String search, Model model) {
         model.addAttribute("employees", employeeService.searchEmployees(search));
         model.addAttribute("search", search);
         model.addAttribute("employee", new Employee());
@@ -41,7 +41,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable Long id, Model model, RedirectAttributes ra) {
+    public String editForm(@PathVariable("id") Long id, Model model, RedirectAttributes ra) {
         return employeeService.getEmployeeById(id)
                 .map(employee -> {
                     model.addAttribute("employee", employee);
@@ -66,7 +66,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
-    public String update(@PathVariable Long id,
+    public String update(@PathVariable("id") Long id,
                          @Valid @ModelAttribute("employee") Employee employee,
                          BindingResult br,
                          Model model,
@@ -81,7 +81,7 @@ public class EmployeeController {
     }
 
     @PostMapping("/{id}/delete")
-    public String delete(@PathVariable Long id, RedirectAttributes ra) {
+    public String delete(@PathVariable("id") Long id, RedirectAttributes ra) {
         employeeService.deleteEmployee(id);
         ra.addFlashAttribute("successMessage", "Employee removed");
         return "redirect:/employees";

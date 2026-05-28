@@ -11,6 +11,7 @@ public interface BillingService {
     Optional<Invoice> getInvoiceById(Long id);
     Invoice createInvoice(Invoice invoice, Long reservationId, Long orderId);
     BigDecimal getRevenue();
+    BigDecimal getMonthlyRevenue();
     BigDecimal getTaxAmount();
 }
 

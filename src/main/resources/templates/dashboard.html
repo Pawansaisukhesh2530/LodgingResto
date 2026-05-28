@@ -5,164 +5,416 @@
 <div class="app-shell">
     <aside class="sidebar collapse d-lg-block" id="sidebarCollapse" th:replace="~{fragments/layout :: sidebar('dashboard')}"></aside>
     <div class="content-shell">
-        <header th:replace="~{fragments/layout :: topbar('Dashboard Overview', null, null, null)}"></header>
+        <header th:replace="~{fragments/layout :: topbar('Operations Command Center', null, null, null)}"></header>
 
         <main class="page-body">
-            <section class="hero-panel">
+            <!-- Hero Operational Telemetry Banner -->
+            <section class="hero-panel mb-4">
                 <div>
-                    <div class="eyebrow">Luxury hotel intelligence</div>
-                    <h2>Operate rooms, reservations, billing, and restaurant flow from a premium command center.</h2>
-                    <p class="text-muted mb-0">A polished dashboard experience designed to feel like a modern hotel SaaS product.</p>
+                    <div class="eyebrow">Luxury hospitality intelligence</div>
+                    <h2>Operate rooms, restaurant billing, and developer telemetry from a premium command suite.</h2>
+                    <p class="text-white-50 mb-0 small mt-1">A polished, real-time command dashboard designed to feel like a high-end enterprise SaaS platform.</p>
                 </div>
                 <div class="hero-status">
-                    <div class="status-chip"><span class="status-dot bg-success"></span> Live occupancy sync</div>
-                    <div class="status-chip"><span class="status-dot bg-primary"></span> Elegant UI enabled</div>
+                    <div class="status-chip"><span class="status-dot bg-success"></span> Database live sync</div>
+                    <div class="status-chip"><span class="status-dot bg-warning"></span> AI Co-pilot online</div>
                 </div>
             </section>
 
-            <section class="stats-grid">
-                <article class="stat-card gradient-navy">
-                    <div class="stat-icon"><i class="fa-solid fa-bed"></i></div>
-                    <div class="stat-label">Total Rooms</div>
-                    <div class="stat-value counter-value" th:attr="data-count=${totalRooms}" th:text="${totalRooms}">0</div>
-                    <div class="stat-note">Premium inventory overview</div>
-                </article>
-                <article class="stat-card gradient-blue">
-                    <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
-                    <div class="stat-label">Available Rooms</div>
-                    <div class="stat-value counter-value" th:attr="data-count=${availableRooms}" th:text="${availableRooms}">0</div>
-                    <div class="stat-note">Ready for guest check-in</div>
-                </article>
-                <article class="stat-card gradient-gold">
-                    <div class="stat-icon"><i class="fa-solid fa-user-check"></i></div>
-                    <div class="stat-label">Occupied Rooms</div>
-                    <div class="stat-value counter-value" th:attr="data-count=${occupiedRooms}" th:text="${occupiedRooms}">0</div>
-                    <div class="stat-note">Active stays in progress</div>
-                </article>
-                <article class="stat-card gradient-plum">
-                    <div class="stat-icon"><i class="fa-solid fa-sack-dollar"></i></div>
-                    <div class="stat-label">Revenue</div>
-                    <div class="stat-value counter-value" th:attr="data-count=${revenue}" th:text="${'$' + revenue}">$0</div>
-                    <div class="stat-note">Estimated revenue signal</div>
-                </article>
+            <!-- Grid 1: The Five Core Premium Stats Cards -->
+            <section class="row g-4">
+                <div class="col-12 col-md-6 col-xl">
+                    <article class="stat-card gradient-navy h-100">
+                        <div class="stat-icon"><i class="fa-solid fa-bed"></i></div>
+                        <div class="stat-label">Total Rooms Grid</div>
+                        <div class="stat-value counter-value" th:attr="data-count=${totalRooms}" th:text="${totalRooms}">0</div>
+                        <div class="stat-note">Full room inventory status</div>
+                    </article>
+                </div>
+                <div class="col-12 col-md-6 col-xl">
+                    <article class="stat-card gradient-blue h-100">
+                        <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+                        <div class="stat-label">Available Rooms</div>
+                        <div class="stat-value counter-value" th:attr="data-count=${availableRooms}" th:text="${availableRooms}">0</div>
+                        <div class="stat-note">Ready for immediate check-in</div>
+                    </article>
+                </div>
+                <div class="col-12 col-md-6 col-xl">
+                    <article class="stat-card gradient-gold h-100">
+                        <div class="stat-icon"><i class="fa-solid fa-user-check"></i></div>
+                        <div class="stat-label">Occupied Rooms</div>
+                        <div class="stat-value counter-value" th:attr="data-count=${occupiedRooms}" th:text="${occupiedRooms}">0</div>
+                        <div class="stat-note">Active guest stays in progress</div>
+                    </article>
+                </div>
+                <div class="col-12 col-md-6 col-xl">
+                    <article class="stat-card gradient-teal h-100">
+                        <div class="stat-icon"><i class="fa-solid fa-calendar-week"></i></div>
+                        <div class="stat-label">Monthly Revenue</div>
+                        <div class="stat-value counter-value" th:attr="data-count=${monthlyRevenue}" th:text="${'₹' + monthlyRevenue}">₹0</div>
+                        <div class="stat-note">Current month billing collection</div>
+                    </article>
+                </div>
+                <div class="col-12 col-md-6 col-xl">
+                    <article class="stat-card gradient-plum h-100">
+                        <div class="stat-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                        <div class="stat-label">Gross Revenue</div>
+                        <div class="stat-value counter-value" th:attr="data-count=${revenue}" th:text="${'₹' + revenue}">₹0</div>
+                        <div class="stat-note">Sum of all settled billing invoices</div>
+                    </article>
+                </div>
             </section>
 
-            <section class="row g-4 mt-1">
-                <div class="col-12 col-md-4">
-                    <div class="stat-mini-card"><span>Total Guests</span><strong th:text="${totalGuests}">0</strong></div>
+            <!-- Grid 2: Six Supporting Micro-metrics Cards -->
+            <section class="row g-3 mt-1">
+                <div class="col-6 col-xl-2">
+                    <div class="stat-mini-card">
+                        <div>
+                            <span>Reservations</span>
+                            <strong class="d-block mt-1" th:text="${totalReservations}">0</strong>
+                        </div>
+                        <i class="fa-solid fa-calendar-days text-primary fs-4 opacity-50"></i>
+                    </div>
                 </div>
-                <div class="col-12 col-md-4">
-                    <div class="stat-mini-card"><span>Total Reservations</span><strong th:text="${totalReservations}">0</strong></div>
+                <div class="col-6 col-xl-2">
+                    <div class="stat-mini-card">
+                        <div>
+                            <span>Total Guests</span>
+                            <strong class="d-block mt-1" th:text="${totalGuests}">0</strong>
+                        </div>
+                        <i class="fa-solid fa-user-group text-success fs-4 opacity-50"></i>
+                    </div>
                 </div>
-                <div class="col-12 col-md-4">
-                    <div class="stat-mini-card"><span>Inventory Alerts</span><strong th:text="${inventoryAlerts}">0</strong></div>
+                <div class="col-6 col-xl-2">
+                    <div class="stat-mini-card">
+                        <div>
+                            <span>Food Orders</span>
+                            <strong class="d-block mt-1" th:text="${restaurantOrders}">0</strong>
+                        </div>
+                        <i class="fa-solid fa-utensils text-warning fs-4 opacity-50"></i>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-2">
+                    <div class="stat-mini-card">
+                        <div>
+                            <span>API Requests</span>
+                            <strong class="d-block mt-1" th:text="${apiRequests}">0</strong>
+                        </div>
+                        <i class="fa-solid fa-plug text-info fs-4 opacity-50"></i>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-2">
+                    <div class="stat-mini-card">
+                        <div>
+                            <span>Unpaid Bills</span>
+                            <strong class="d-block mt-1 text-danger" th:text="${pendingPayments}">0</strong>
+                        </div>
+                        <i class="fa-solid fa-file-invoice text-danger fs-4 opacity-50"></i>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-2">
+                    <div class="stat-mini-card">
+                        <div>
+                            <span>Low Stocks</span>
+                            <strong class="d-block mt-1" th:classappend="${inventoryAlerts > 0} ? 'text-warning' : ''" th:text="${inventoryAlerts}">0</strong>
+                        </div>
+                        <i class="fa-solid fa-triangle-exclamation text-warning fs-4 opacity-50"></i>
+                    </div>
                 </div>
             </section>
 
+            <!-- Grid 3: Visual Analytics (6 Chart.js Cards) -->
+            <!-- Row A: Line Chart & Pie Chart -->
             <section class="row g-4 mt-1">
                 <div class="col-12 col-xl-8">
-                    <div class="glass-card h-100">
+                    <div class="glass-card">
                         <div class="section-header">
                             <div>
-                                <div class="eyebrow">Operations chart</div>
-                                <h3 class="section-title mb-0">Room status distribution</h3>
+                                <div class="eyebrow">Finance analytics</div>
+                                <h3 class="section-title mb-0">Monthly Gross Revenue Trend</h3>
                             </div>
-                            <a th:href="@{/rooms/new}" class="btn btn-premium"><i class="fa-solid fa-plus me-2"></i>Add Room</a>
                         </div>
-                        <div class="chart-wrap">
-                            <canvas id="roomChart"
-                                    height="130"
-                                    th:attr="data-labels=${roomChartLabels},data-values=${roomChartValues}"></canvas>
+                        <div class="chart-wrap mt-3" style="min-height: 240px; position: relative;">
+                            <canvas id="revenueChart" th:attr="data-labels=${revenueChartLabels},data-values=${revenueChartValues}"></canvas>
                         </div>
                     </div>
                 </div>
                 <div class="col-12 col-xl-4">
-                    <div class="glass-card h-100">
+                    <div class="glass-card">
                         <div class="section-header">
                             <div>
-                                <div class="eyebrow">Quick actions</div>
-                                <h3 class="section-title mb-0">Dashboard shortcuts</h3>
+                                <div class="eyebrow">Rooms breakdown</div>
+                                <h3 class="section-title mb-0">Room Status Distribution</h3>
                             </div>
                         </div>
-                        <div class="quick-actions">
-                            <a th:href="@{/rooms/new}" class="quick-action-item">
-                                <i class="fa-solid fa-circle-plus"></i>
-                                <div>
-                                    <div class="fw-semibold">Create Room</div>
-                                    <div class="small text-muted">Add a premium room record</div>
-                                </div>
-                            </a>
-                            <a th:href="@{/rooms}" class="quick-action-item">
-                                <i class="fa-solid fa-table-list"></i>
-                                <div>
-                                    <div class="fw-semibold">Manage Rooms</div>
-                                    <div class="small text-muted">Search and filter inventory</div>
-                                </div>
-                            </a>
-                            <a href="javascript:void(0)" class="quick-action-item">
-                                <i class="fa-solid fa-chart-pie"></i>
-                                <div>
-                                    <div class="fw-semibold">View Analytics</div>
-                                    <div class="small text-muted">Future performance insights</div>
-                                </div>
-                            </a>
+                        <div class="chart-wrap mt-3" style="min-height: 240px; position: relative;">
+                            <canvas id="roomChart" th:attr="data-labels=${roomChartLabels},data-values=${roomChartValues}"></canvas>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section class="row g-4 mt-1">
+            <!-- Row B: Bar Chart & Doughnut Chart -->
+            <section class="row g-4 mt-2">
                 <div class="col-12 col-xl-6">
-                    <div class="glass-card p-4 h-100">
+                    <div class="glass-card">
                         <div class="section-header">
                             <div>
-                                <div class="eyebrow">Recent reservations</div>
-                                <h3 class="section-title mb-0">Latest bookings</h3>
+                                <div class="eyebrow">Kitchen analytics</div>
+                                <h3 class="section-title mb-0">Restaurant Sales Dynamics</h3>
                             </div>
                         </div>
-                        <div class="table-responsive premium-table-wrap mt-3">
-                            <table class="table premium-table mb-0">
-                                <thead><tr><th>Guest</th><th>Room</th><th>Status</th></tr></thead>
-                                <tbody>
-                                <tr th:each="reservation : ${recentReservations}">
-                                    <td th:text="${reservation.guest != null ? reservation.guest.fullName : '-'}">Guest</td>
-                                    <td th:text="${reservation.room != null ? reservation.room.roomNumber : '-'}">Room</td>
-                                    <td th:text="${reservation.paymentStatus}">PENDING</td>
-                                </tr>
-                                </tbody>
-                            </table>
+                        <div class="chart-wrap mt-3" style="min-height: 220px; position: relative;">
+                            <canvas id="restaurantChart" th:attr="data-labels=${restaurantChartLabels},data-values=${restaurantChartValues}"></canvas>
                         </div>
                     </div>
                 </div>
                 <div class="col-12 col-xl-6">
-                    <div class="glass-card p-4 h-100">
+                    <div class="glass-card">
                         <div class="section-header">
                             <div>
-                                <div class="eyebrow">Recent invoices</div>
-                                <h3 class="section-title mb-0">Billing activity</h3>
+                                <div class="eyebrow">Reservations overview</div>
+                                <h3 class="section-title mb-0">Bill Settlement Distribution</h3>
                             </div>
                         </div>
-                        <div class="table-responsive premium-table-wrap mt-3">
-                            <table class="table premium-table mb-0">
-                                <thead><tr><th>Invoice</th><th>Type</th><th>Total</th></tr></thead>
-                                <tbody>
-                                <tr th:each="invoice : ${recentInvoices}">
-                                    <td th:text="${invoice.invoiceNumber}">INV</td>
-                                    <td th:text="${invoice.invoiceType}">ROOM</td>
-                                    <td th:text="${invoice.totalAmount}">$0</td>
-                                </tr>
-                                </tbody>
-                            </table>
+                        <div class="chart-wrap mt-3" style="min-height: 220px; position: relative;">
+                            <canvas id="resChart" th:attr="data-labels=${resChartLabels},data-values=${resChartValues}"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Row C: Area Chart & Horizontal Bar Chart -->
+            <section class="row g-4 mt-2">
+                <div class="col-12 col-xl-6">
+                    <div class="glass-card">
+                        <div class="section-header">
+                            <div>
+                                <div class="eyebrow">Developer telemetry</div>
+                                <h3 class="section-title mb-0">API Traffic Load Curve</h3>
+                            </div>
+                        </div>
+                        <div class="chart-wrap mt-3" style="min-height: 220px; position: relative;">
+                            <canvas id="apiChart" th:attr="data-labels=${apiChartLabels},data-values=${apiChartValues}"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-6">
+                    <div class="glass-card">
+                        <div class="section-header">
+                            <div>
+                                <div class="eyebrow">Stock alerts</div>
+                                <h3 class="section-title mb-0">Inventory Stock Status</h3>
+                            </div>
+                        </div>
+                        <div class="chart-wrap mt-3" style="min-height: 220px; position: relative;">
+                            <canvas id="inventoryChart" th:attr="data-labels=${inventoryChartLabels},data-values=${inventoryChartValues}"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Grid 4: Recent Activity Panel (Tabbed Modern SaaS Panel) -->
+            <section class="row g-4 mt-2">
+                <div class="col-12">
+                    <div class="glass-card p-4">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3 border-bottom pb-3">
+                            <div>
+                                <div class="eyebrow">Operational stream</div>
+                                <h3 class="section-title mb-0">Recent Activity Stream</h3>
+                            </div>
+                            <!-- Nav Pills for beautiful switching -->
+                            <ul class="nav nav-pills premium-pills" id="activityTabs" role="tablist">
+                                <li class="nav-item">
+                                    <button class="nav-link active" id="reservations-tab" data-bs-toggle="pill" data-bs-target="#tab-reservations" type="button" role="tab">Bookings</button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link" id="orders-tab" data-bs-toggle="pill" data-bs-target="#tab-orders" type="button" role="tab">Kitchen Orders</button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link" id="invoices-tab" data-bs-toggle="pill" data-bs-target="#tab-invoices" type="button" role="tab">Payments</button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link" id="api-tab" data-bs-toggle="pill" data-bs-target="#tab-api" type="button" role="tab">Developer Logs</button>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Tab Content Grid -->
+                        <div class="tab-content mt-3" id="activityTabsContent">
+                            <!-- 1. Reservations Tab -->
+                            <div class="tab-pane fade show active" id="tab-reservations" role="tabpanel">
+                                <div class="table-responsive premium-table-wrap">
+                                    <table class="table premium-table mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th>Guest</th>
+                                            <th>Room</th>
+                                            <th>Dates</th>
+                                            <th>Guests</th>
+                                            <th>Bill Status</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="r : ${recentReservations}">
+                                            <td>
+                                                <div class="fw-semibold text-primary" th:text="${r.guest != null ? r.guest.fullName : '-'}">Guest Name</div>
+                                                <div class="small text-muted" th:text="${r.guest != null ? r.guest.email : ''}">email</div>
+                                            </td>
+                                            <td><span class="room-number-pill" th:text="${'Room ' + (r.room != null ? r.room.roomNumber : '-')}">Room 101</span></td>
+                                            <td th:text="${r.checkInDate + ' to ' + r.checkOutDate}">Dates</td>
+                                            <td th:text="${r.totalGuests}">1</td>
+                                            <td>
+                                                <span class="status-badge" th:classappend="${r.paymentStatus == 'PAID' ? 'badge-available' : 'badge-occupied'}" th:text="${r.paymentStatus}">PENDING</span>
+                                            </td>
+                                        </tr>
+                                        <tr th:if="${#lists.isEmpty(recentReservations)}">
+                                            <td colspan="5" class="text-center text-muted">No recent reservations recorded.</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- 2. Restaurant Orders Tab -->
+                            <div class="tab-pane fade" id="tab-orders" role="tabpanel">
+                                <div class="table-responsive premium-table-wrap">
+                                    <table class="table premium-table mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th>Order #</th>
+                                            <th>Timestamp</th>
+                                            <th>Items Summary</th>
+                                            <th>Total price</th>
+                                            <th>Status</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="o : ${recentOrders}">
+                                            <td><strong class="text-white bg-dark px-2 py-1 rounded" th:text="${'#ORD-' + o.id}">#ORD-1</strong></td>
+                                            <td th:text="${#temporals.format(o.createdAt, 'yyyy-MM-dd HH:mm')}">Time</td>
+                                            <td>
+                                                <span th:each="oi, iter : ${o.items}" 
+                                                      th:text="${oi.menuItem.name + ' (x' + oi.quantity + ')' + (iter.last ? '' : ', ')}"></span>
+                                            </td>
+                                            <td class="price-cell" th:text="${'INR ' + o.total}">INR 0.00</td>
+                                            <td>
+                                                <span class="status-badge" th:classappend="${o.status == 'COMPLETED' ? 'badge-available' : 'badge-maintenance'}" th:text="${o.status}">PENDING</span>
+                                            </td>
+                                        </tr>
+                                        <tr th:if="${#lists.isEmpty(recentOrders)}">
+                                            <td colspan="5" class="text-center text-muted">No recent restaurant orders.</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- 3. Invoices / Payments Tab -->
+                            <div class="tab-pane fade" id="tab-invoices" role="tabpanel">
+                                <div class="table-responsive premium-table-wrap">
+                                    <table class="table premium-table mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th>Invoice Number</th>
+                                            <th>Settled Date</th>
+                                            <th>Invoice Type</th>
+                                            <th>Payment Mode</th>
+                                            <th>Total Settled</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="i : ${recentInvoices}">
+                                            <td><code class="text-primary font-monospace fw-bold" th:text="${i.invoiceNumber}">INV-1</code></td>
+                                            <td th:text="${#temporals.format(i.createdAt, 'yyyy-MM-dd HH:mm')}">Date</td>
+                                            <td><span class="badge bg-secondary" th:text="${i.invoiceType}">ROOM</span></td>
+                                            <td><span class="badge bg-info text-dark" th:text="${i.paymentMethod}">CASH</span></td>
+                                            <td class="price-cell text-success" th:text="${'INR ' + i.totalAmount}">INR 0.00</td>
+                                        </tr>
+                                        <tr th:if="${#lists.isEmpty(recentInvoices)}">
+                                            <td colspan="5" class="text-center text-muted">No recent billing logs found.</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- 4. Developer Logs Tab -->
+                            <div class="tab-pane fade" id="tab-api" role="tabpanel">
+                                <div class="table-responsive premium-table-wrap">
+                                    <table class="table premium-table mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>API Route</th>
+                                            <th>Method</th>
+                                            <th>Time cost</th>
+                                            <th>Status</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="a : ${recentApiLogs}">
+                                            <td th:text="${a.formattedRequestTime}">Time</td>
+                                            <td><code class="text-success" th:text="${a.endpoint}">/api/bookings</code></td>
+                                            <td><span class="badge bg-dark" th:text="${a.method}">GET</span></td>
+                                            <td th:text="${a.durationMs + ' ms'}">0 ms</td>
+                                            <td>
+                                                <span class="status-badge" th:classappend="${a.responseStatus >= 400} ? 'badge-occupied' : 'badge-available'" th:text="${a.responseStatus}">200</span>
+                                            </td>
+                                        </tr>
+                                        <tr th:if="${#lists.isEmpty(recentApiLogs)}">
+                                            <td colspan="5" class="text-center text-muted">No developer traffic logs logged.</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
         </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
     </div>
 </div>
+
 <div th:replace="~{fragments/layout :: flashToasts}"></div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
+
+<style>
+    /* Styling Nav Pills to be extremely premium and glassmorphic */
+    .premium-pills .nav-link {
+        color: var(--text-muted);
+        background: rgba(15, 23, 42, 0.04);
+        border: 1px solid rgba(15, 23, 42, 0.04);
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 0.82rem;
+        margin-left: 6px;
+        border-radius: var(--radius-sm);
+        padding: 8px 16px;
+        transition: var(--transition-smooth);
+    }
+    .premium-pills .nav-link:hover {
+        background: rgba(15, 23, 42, 0.08);
+        color: var(--text-primary);
+    }
+    .premium-pills .nav-link.active {
+        background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 100%) !important;
+        color: #070c19 !important;
+        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
+        border-color: rgba(212, 175, 55, 0.15);
+    }
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
 </body>
 </html>
-
-
