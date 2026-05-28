@@ -257,14 +257,14 @@
                                         </thead>
                                         <tbody>
                                         <tr th:each="r : ${recentReservations}">
-                                            <td>
-                                                <div class="fw-semibold text-primary" th:text="${r.guest != null ? r.guest.fullName : '-'}">Guest Name</div>
+                                            <td data-label="Guest">
+                                                <div class="fw-semibold text-premium" th:text="${r.guest != null ? r.guest.fullName : '-'}">Guest Name</div>
                                                 <div class="small text-muted" th:text="${r.guest != null ? r.guest.email : ''}">email</div>
                                             </td>
-                                            <td><span class="room-number-pill" th:text="${'Room ' + (r.room != null ? r.room.roomNumber : '-')}">Room 101</span></td>
-                                            <td th:text="${r.checkInDate + ' to ' + r.checkOutDate}">Dates</td>
-                                            <td th:text="${r.totalGuests}">1</td>
-                                            <td>
+                                            <td data-label="Room"><span class="room-number-pill" th:text="${'Room ' + (r.room != null ? r.room.roomNumber : '-')}">Room 101</span></td>
+                                            <td data-label="Dates" th:text="${r.checkInDate + ' to ' + r.checkOutDate}">Dates</td>
+                                            <td data-label="Guests" th:text="${r.totalGuests}">1</td>
+                                            <td data-label="Status">
                                                 <span class="status-badge" th:classappend="${r.paymentStatus == 'PAID' ? 'badge-available' : 'badge-occupied'}" th:text="${r.paymentStatus}">PENDING</span>
                                             </td>
                                         </tr>
@@ -291,14 +291,14 @@
                                         </thead>
                                         <tbody>
                                         <tr th:each="o : ${recentOrders}">
-                                            <td><strong class="text-white bg-dark px-2 py-1 rounded" th:text="${'#ORD-' + o.id}">#ORD-1</strong></td>
-                                            <td th:text="${#temporals.format(o.createdAt, 'yyyy-MM-dd HH:mm')}">Time</td>
-                                            <td>
+                                            <td data-label="Order #"><span class="badge-premium badge-premium-method" th:text="${'#ORD-' + o.id}">#ORD-1</span></td>
+                                            <td data-label="Time" th:text="${#temporals.format(o.createdAt, 'yyyy-MM-dd HH:mm')}">Time</td>
+                                            <td data-label="Items">
                                                 <span th:each="oi, iter : ${o.items}" 
                                                       th:text="${oi.menuItem.name + ' (x' + oi.quantity + ')' + (iter.last ? '' : ', ')}"></span>
                                             </td>
-                                            <td class="price-cell" th:text="${'INR ' + o.total}">INR 0.00</td>
-                                            <td>
+                                            <td data-label="Total" class="price-cell" th:text="${'INR ' + o.total}">INR 0.00</td>
+                                            <td data-label="Status">
                                                 <span class="status-badge" th:classappend="${o.status == 'COMPLETED' ? 'badge-available' : 'badge-maintenance'}" th:text="${o.status}">PENDING</span>
                                             </td>
                                         </tr>
@@ -325,11 +325,11 @@
                                         </thead>
                                         <tbody>
                                         <tr th:each="i : ${recentInvoices}">
-                                            <td><code class="text-primary font-monospace fw-bold" th:text="${i.invoiceNumber}">INV-1</code></td>
-                                            <td th:text="${#temporals.format(i.createdAt, 'yyyy-MM-dd HH:mm')}">Date</td>
-                                            <td><span class="badge bg-secondary" th:text="${i.invoiceType}">ROOM</span></td>
-                                            <td><span class="badge bg-info text-dark" th:text="${i.paymentMethod}">CASH</span></td>
-                                            <td class="price-cell text-success" th:text="${'INR ' + i.totalAmount}">INR 0.00</td>
+                                            <td data-label="Invoice #"><code class="text-primary font-monospace fw-bold" th:text="${i.invoiceNumber}">INV-1</code></td>
+                                            <td data-label="Date" th:text="${#temporals.format(i.createdAt, 'yyyy-MM-dd HH:mm')}">Date</td>
+                                            <td data-label="Type"><span class="badge-premium badge-premium-invoice" th:text="${i.invoiceType}">ROOM</span></td>
+                                            <td data-label="Method"><span class="badge-premium" th:classappend="${i.paymentMethod == 'CASH' ? ' badge-premium-cash' : i.paymentMethod == 'CARD' ? ' badge-premium-card' : ' badge-premium-upi'}" th:text="${i.paymentMethod}">CASH</span></td>
+                                            <td data-label="Total" class="price-cell text-success" th:text="${'INR ' + i.totalAmount}">INR 0.00</td>
                                         </tr>
                                         <tr th:if="${#lists.isEmpty(recentInvoices)}">
                                             <td colspan="5" class="text-center text-muted">No recent billing logs found.</td>
@@ -354,11 +354,11 @@
                                         </thead>
                                         <tbody>
                                         <tr th:each="a : ${recentApiLogs}">
-                                            <td th:text="${a.formattedRequestTime}">Time</td>
-                                            <td><code class="text-success" th:text="${a.endpoint}">/api/bookings</code></td>
-                                            <td><span class="badge bg-dark" th:text="${a.method}">GET</span></td>
-                                            <td th:text="${a.durationMs + ' ms'}">0 ms</td>
-                                            <td>
+                                            <td data-label="Time" th:text="${a.formattedRequestTime}">Time</td>
+                                            <td data-label="Route"><code class="text-success" th:text="${a.endpoint}">/api/bookings</code></td>
+                                            <td data-label="Method"><span class="badge-premium badge-premium-method" th:text="${a.method}">GET</span></td>
+                                            <td data-label="Cost" th:text="${a.durationMs + ' ms'}">0 ms</td>
+                                            <td data-label="Status">
                                                 <span class="status-badge" th:classappend="${a.responseStatus >= 400} ? 'badge-occupied' : 'badge-available'" th:text="${a.responseStatus}">200</span>
                                             </td>
                                         </tr>

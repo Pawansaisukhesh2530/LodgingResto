@@ -41,7 +41,7 @@
                             <td data-label="Dept" th:text="${e.department}">Dept</td>
                             <td data-label="Position" th:text="${e.position}">Position</td>
                             <td data-label="Phone" th:text="${e.phoneNumber}">Phone</td>
-                            <td data-label="Salary" th:text="${e.salary}">0</td>
+                            <td data-label="Salary" class="price-cell" th:text="${'₹' + e.salary}">₹0</td>
                             <td data-label="Actions">
                                 <div class="action-group justify-content-end">
                                     <a th:href="@{/employees/{id}/edit(id=${e.id})}" class="btn btn-edit btn-action"><i class="fa-solid fa-pen-to-square"></i></a>

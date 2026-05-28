@@ -7,14 +7,26 @@
     <div class="content-shell">
         <header th:replace="~{fragments/layout :: topbar('Reports & Analytics', null, null, null)}"></header>
         <main class="page-body">
+            <section class="hero-panel mb-4">
+                <div>
+                    <div class="eyebrow">Performance reports</div>
+                    <h2>Revenue analytics & operational metrics</h2>
+                    <p class="text-white-50 mb-0 small mt-1">Track gross revenue, monthly trends, and key performance indicators across rooms, restaurant, and billing.</p>
+                </div>
+                <div class="hero-status">
+                    <div class="status-chip"><span class="status-dot bg-success"></span> Live data sync</div>
+                    <div class="status-chip"><span class="status-dot bg-warning"></span> Real-time analytics</div>
+                </div>
+            </section>
+
             <section class="glass-card p-4">
                 <div class="section-header mb-3">
                     <div>
-                        <div class="eyebrow">Performance reports</div>
-                        <h2 class="mb-0">Revenue overview</h2>
+                        <div class="eyebrow">Financial trends</div>
+                        <h2 class="mb-0">Monthly revenue chart</h2>
                     </div>
                 </div>
-                <div class="chart-wrap">
+                <div class="chart-wrap" style="min-height: 320px;">
                     <canvas id="revenueChart"></canvas>
                 </div>
             </section>

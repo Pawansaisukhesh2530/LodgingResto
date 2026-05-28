@@ -13,13 +13,13 @@
                         <div class="eyebrow">Alerts center</div>
                         <h2 class="mb-0">Live operational notifications</h2>
                     </div>
-                    <span class="badge bg-danger rounded-pill px-3 py-2" th:text="${#lists.size(notifications)} + ' Active'">0 Active</span>
+                    <span class="badge-premium badge-premium-status-pending px-3 py-2" th:text="${#lists.size(notifications)} + ' Active'">0 Active</span>
                 </div>
                 <div class="list-group mt-3">
-                    <div class="list-group-item d-flex align-items-center gap-3" th:each="n : ${notifications}">
-                        <div class="delete-icon-wrap mb-0" style="width:52px;height:52px;">
-                            <i class="fa-solid" th:classappend="${n.category == 'BOOKING' ? 'fa-calendar-check' : n.category == 'PAYMENT' ? 'fa-credit-card' : n.category == 'INVENTORY' ? 'fa-boxes-stacked' : 'fa-bell'}"></i>
-                        </div>
+                        <div class="list-group-item d-flex align-items-center gap-3" th:each="n : ${notifications}">
+                            <div class="notif-icon-wrap" th:classappend="${n.category == 'BOOKING' ? 'booking' : n.category == 'PAYMENT' ? 'payment' : n.category == 'INVENTORY' ? 'inventory' : ''}">
+                                <i class="fa-solid" th:classappend="${n.category == 'BOOKING' ? 'fa-calendar-check' : n.category == 'PAYMENT' ? 'fa-credit-card' : n.category == 'INVENTORY' ? 'fa-boxes-stacked' : 'fa-bell'}"></i>
+                            </div>
                         <div>
                             <div class="fw-semibold" th:text="${n.message}">Notification</div>
                             <div class="small text-muted" th:text="${#temporals.format(n.createdAt, 'yyyy-MM-dd HH:mm')}">Just now</div>

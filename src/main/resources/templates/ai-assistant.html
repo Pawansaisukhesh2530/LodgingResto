@@ -28,7 +28,7 @@
                         <div class="chat-header d-flex align-items-center gap-3 border-bottom pb-3 mb-3">
                             <div class="assistant-avatar"><i class="fa-solid fa-robot"></i></div>
                             <div>
-                                <h4 class="mb-0 fs-5 text-dark">Lodgings Co-pilot</h4>
+                                <h4 class="mb-0 fs-5 text-premium">Lodgings Co-pilot</h4>
                                 <p class="text-muted mb-0 small">Ask about rooms, restaurant menus, booking status or stock details.</p>
                             </div>
                         </div>
@@ -193,9 +193,10 @@
 <style>
     /* Conversational Chat CSS overrides for maximum SaaS polish */
     .chat-widget-card {
-        border: 1px solid var(--border-color);
-        background: rgba(255,255,255,0.9);
+        border: 1px solid var(--border-glass);
+        background: var(--bg-card);
         box-shadow: var(--shadow-lg);
+        backdrop-filter: blur(16px);
     }
     .assistant-avatar {
         width: 44px;
@@ -221,12 +222,13 @@
     }
     .message-card {
         max-width: 82%;
-        background: #fff;
-        border: 1px solid rgba(15, 23, 42, 0.07);
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid var(--border-glass);
         box-shadow: var(--shadow-sm);
         border-radius: var(--radius-md);
         padding: 16px 20px;
         transition: var(--transition-smooth);
+        backdrop-filter: blur(8px);
     }
     .message-card:hover {
         box-shadow: var(--shadow-md);
@@ -238,6 +240,8 @@
         border-top-right-radius: 4px;
     }
     .assistant-bubble .message-card {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: var(--border-glass);
         border-top-left-radius: 4px;
     }
     .message-header {
@@ -248,7 +252,7 @@
         letter-spacing: 0.8px;
         color: var(--text-muted);
         margin-bottom: 8px;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        border-bottom: 1px solid var(--border-color);
         padding-bottom: 4px;
     }
     .message-content {
@@ -266,7 +270,7 @@
         font-size: 0.85rem;
     }
     .message-content table th {
-        background: #0f172a;
+        background: #060910;
         color: #fff;
         padding: 8px 12px;
         font-weight: 600;
@@ -283,8 +287,8 @@
     .preset-chip {
         cursor: pointer;
         padding: 8px 14px;
-        background: rgba(15, 23, 42, 0.04);
-        border: 1px solid rgba(15, 23, 42, 0.05);
+        background: var(--bg-input);
+        border: 1px solid var(--border-color);
         color: var(--text-muted);
         font-size: 0.78rem;
         font-weight: 600;
@@ -292,8 +296,8 @@
         transition: var(--transition-smooth);
     }
     .preset-chip:hover {
-        background: var(--text-primary);
-        color: #fff;
+        background: var(--gold);
+        color: #070c19;
         transform: translateY(-2px);
         box-shadow: var(--shadow-sm);
     }

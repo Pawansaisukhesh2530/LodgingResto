@@ -14,7 +14,7 @@
                         <h2 class="mb-0">Categories & dishes</h2>
                     </div>
                     <div>
-                        <a href="#addCategory" class="btn btn-outline-light me-2" data-bs-toggle="modal">Add Category</a>
+                        <a href="#addCategory" class="btn btn-outline-secondary me-2" data-bs-toggle="modal">Add Category</a>
                         <a href="#addItem" class="btn btn-premium" data-bs-toggle="modal">Add Item</a>
                     </div>
                 </div>
@@ -30,10 +30,10 @@
                                                 <i class="fa-solid" th:classappend="${(#strings.contains(#strings.toLowerCase(c.name), 'drink') || #strings.contains(#strings.toLowerCase(c.name), 'beverage')) ? 'fa-glass-water text-warning' : (#strings.contains(#strings.toLowerCase(c.name), 'dessert') ? 'fa-ice-cream text-warning' : 'fa-utensils text-warning')}"></i>
                                             </div>
                                             <div>
-                                                <div class="fw-semibold text-dark fs-6" th:text="${i.name}">Item</div>
-                                                <div class="text-warning small" style="font-size: 0.72rem;">
-                                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                                                    <span class="text-muted ms-1">(5.0)</span>
+                                                <div class="fw-semibold text-premium fs-6" th:text="${i.name}">Item</div>
+                                                <div class="small text-premium-muted" style="font-size: 0.72rem;">
+                                                    <i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i>
+                                                    <span class="text-premium-muted ms-1">(5.0)</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -41,14 +41,14 @@
                                             <div class="room-number-pill price-cell px-3 py-1" style="font-size: 0.88rem; background: var(--gold-soft); border-color: rgba(212, 175, 55, 0.2);" th:text="${'₹' + i.price}">₹0</div>
                                         </div>
                                     </div>
-                                    <p class="small text-muted mb-3" th:text="${i.description}">Desc</p>
+                                    <p class="small text-premium-muted mb-3" th:text="${i.description}">Desc</p>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center mt-auto border-top pt-2">
-                                    <span class="text-muted small fw-semibold"><i class="fa-solid fa-circle-check text-success me-1"></i>Available</span>
+                                    <span class="text-premium-muted small fw-semibold"><i class="fa-solid fa-circle-check text-success me-1"></i>Available</span>
                                     <div class="action-group">
-                                        <a th:href="@{/restaurant/{id}/edit(id=${i.id})}" class="btn btn-edit btn-action py-1 px-2"><i class="fa-solid fa-pen-to-square"></i></a>
+                                        <a th:href="@{/restaurant/{id}/edit(id=${i.id})}" class="btn btn-edit btn-action py-1 px-2"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</a>
                                         <form th:action="@{/restaurant/items/{id}/delete(id=${i.id})}" method="post" onsubmit="return confirm('Delete this menu item?');" class="m-0">
-                                            <button class="btn btn-delete btn-action py-1 px-2" type="submit"><i class="fa-solid fa-trash"></i></button>
+                                            <button class="btn btn-delete btn-action py-1 px-2" type="submit"><i class="fa-solid fa-trash me-1"></i>Delete</button>
                                         </form>
                                     </div>
                                 </div>
@@ -71,10 +71,12 @@
                         <tbody>
                         <tr th:if="${#lists.isEmpty(orders)}"><td colspan="4" class="text-center py-5">No orders found.</td></tr>
                         <tr th:each="o : ${orders}">
-                            <td data-label="Order #" th:text="${o.id}">1</td>
+                            <td data-label="Order #"><span class="badge-premium badge-premium-method" th:text="${'#' + o.id}">#1</span></td>
                             <td data-label="Created" th:text="${o.createdAt}">Now</td>
-                            <td data-label="Status" th:text="${o.status}">PENDING</td>
-                            <td data-label="Total" th:text="${'₹' + o.total}">₹0</td>
+                            <td data-label="Status">
+                                <span class="badge-premium" th:classappend="${o.status == 'COMPLETED' ? ' badge-premium-status-paid' : o.status == 'CANCELLED' ? ' badge-premium-status-cancelled' : ' badge-premium-status-pending'}" th:text="${o.status}">PENDING</span>
+                            </td>
+                            <td data-label="Total" class="price-cell" th:text="${'₹' + o.total}">₹0</td>
                         </tr>
                         </tbody>
                     </table>
